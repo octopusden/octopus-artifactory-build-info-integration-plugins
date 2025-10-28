@@ -44,7 +44,7 @@ class JFrogNpmCliServiceImpl(
         
         if (!result.isSuccess()) {
             throw MojoExecutionException(
-                "Failed to install NPM dependencies. Exit code: ${result.exitCode}, Error: ${result.errorOutput}}"
+                "Failed to install NPM dependencies. Exit code: ${result.exitCode}, Error: ${result.errorOutput}"
             )
         }
 
@@ -86,10 +86,10 @@ class JFrogNpmCliServiceImpl(
         if (result.isSuccess()) {
             logger.debug("JFrog CLI is available: ${result.output.trim()}")
             return true
-        } else {
-            logger.error("JFrog CLI is not available or not configured properly. Error: $result.errorOutput}")
-            return false
         }
+
+        logger.error("JFrog CLI is not available or not configured properly. Error: ${result.errorOutput}")
+        return false
     }
 
 }

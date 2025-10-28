@@ -65,12 +65,9 @@ class CommandExecutorServiceImpl : CommandExecutorService {
             
             if (!finished) {
                 process.destroyForcibly()
-                logger.error("Command timed out after $DEFAULT_TIMEOUT_MINUTES minutes: ${command.joinToString(" ")}")
-                return CommandResult(
-                    exitCode = -1,
-                    output = outputBuilder.toString(),
-                    errorOutput = "Command timed out after $DEFAULT_TIMEOUT_MINUTES minutes"
-                )
+                val errorMsg = "Command timed out after $DEFAULT_TIMEOUT_MINUTES minutes: ${command.joinToString(" ")}"
+                logger.error(errorMsg)
+                throw RuntimeException(errorMsg)
             }
 
             outputThread.join(5000)
@@ -81,13 +78,21 @@ class CommandExecutorServiceImpl : CommandExecutorService {
             val errorOutput = errorBuilder.toString().trim()
             
             logger.debug("Command finished with exit code: $exitCode")
+
+            if (exitCode != 0) {
+                val errorMsg = "Command failed with exit code $exitCode: ${command.joinToString(" ")}\nError: $errorOutput"
+                logger.error(errorMsg)
+                throw RuntimeException(errorMsg)
+            }
             
             return CommandResult(
                 exitCode = exitCode,
                 output = output,
                 errorOutput = errorOutput
             )
-            
+
+        } catch (e: RuntimeException) {
+            throw e
         } catch (e: Exception) {
             logger.error("Error executing command: ${command.joinToString(" ")}", e)
             return CommandResult(

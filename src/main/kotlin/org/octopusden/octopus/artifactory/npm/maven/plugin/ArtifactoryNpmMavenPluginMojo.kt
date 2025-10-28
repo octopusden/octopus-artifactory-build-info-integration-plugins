@@ -14,6 +14,7 @@ import org.octopusden.octopus.artifactory.npm.maven.plugin.service.impl.Artifact
 import org.octopusden.octopus.artifactory.npm.maven.plugin.service.impl.CommandExecutorServiceImpl
 import org.octopusden.octopus.artifactory.npm.maven.plugin.service.impl.JFrogNpmCliServiceImpl
 import org.octopusden.octopus.artifactory.npm.maven.plugin.service.impl.NpmBuildInfoIntegrationServiceImpl
+import org.octopusden.octopus.artifactory.npm.maven.plugin.utils.ParameterValidator
 import org.octopusden.octopus.infrastructure.artifactory.client.ArtifactoryClassicClient
 import org.octopusden.octopus.infrastructure.artifactory.client.ArtifactoryClient
 import org.octopusden.octopus.infrastructure.client.commons.ClientParametersProvider
@@ -77,6 +78,7 @@ class ArtifactoryNpmMavenPluginMojo : AbstractMojo() {
 
         log.info("Starting NPM build info integration for build $buildName:$buildNumber")
 
+        validateParameters()
         initializeServices()
         val pluginConfiguration = PluginConfiguration(
             buildName, buildNumber,
@@ -95,6 +97,11 @@ class ArtifactoryNpmMavenPluginMojo : AbstractMojo() {
         session.request.executionListener = ArtifactoryNpmBuildInfoListener(originalListener) {
             integrationService.integrateNpmBuildInfo(pluginConfiguration)
         }
+    }
+
+    private fun validateParameters() {
+        ParameterValidator.validateArtifactoryUrl(artifactoryUrl)
+        ParameterValidator.validatePackageJsonFile(File(project.basedir, packageJsonPath))
     }
 
     private fun initializeServices() {

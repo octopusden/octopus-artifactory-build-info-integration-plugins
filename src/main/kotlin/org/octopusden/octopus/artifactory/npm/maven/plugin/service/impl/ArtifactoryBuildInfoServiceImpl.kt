@@ -22,7 +22,7 @@ class ArtifactoryBuildInfoServiceImpl(
             logger.info("Get build info $buildName:$buildNumber")
             artifactoryClient.getBuildInfo(buildName, buildNumber).buildInfo
         } catch (e: NotFoundException) {
-            error("Build info not found for $buildName:$buildNumber. Please ensure the build info has been published.")
+            throw MojoExecutionException("Build info not found for $buildName:$buildNumber. Please ensure the build info has been published.")
         }
 
     override fun mergeBuildInfo(mavenBuildInfo: BuildInfo, npmBuildInfo: BuildInfo): BuildInfo {
