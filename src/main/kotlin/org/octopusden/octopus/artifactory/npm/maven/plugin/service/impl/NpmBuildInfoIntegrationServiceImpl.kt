@@ -1,8 +1,8 @@
 package org.octopusden.octopus.artifactory.npm.maven.plugin.service.impl
 
-import org.apache.maven.plugin.MojoExecutionException
 import org.octopusden.octopus.artifactory.npm.maven.plugin.configuration.ArtifactoryConfiguration
 import org.octopusden.octopus.artifactory.npm.maven.plugin.configuration.PluginConfiguration
+import org.octopusden.octopus.artifactory.npm.maven.plugin.exception.ConfigurationException
 import org.octopusden.octopus.artifactory.npm.maven.plugin.service.ArtifactoryBuildInfoService
 import org.octopusden.octopus.artifactory.npm.maven.plugin.service.JFrogNpmCliService
 import org.octopusden.octopus.artifactory.npm.maven.plugin.service.NpmBuildInfoIntegrationService
@@ -22,7 +22,7 @@ class NpmBuildInfoIntegrationServiceImpl(
         logger.info("Generate NPM build info for build ${pluginConfig.buildName}:${pluginConfig.buildNumber}")
 
         if (!jfrogNpmCliService.isJFrogCliAvailable()) {
-            throw MojoExecutionException("JFrog CLI is not available")
+            throw ConfigurationException("JFrog CLI is not available or not properly configured")
         }
 
         jfrogNpmCliService.configureNpmRepository(pluginConfig.workingDirectory, pluginConfig.npmRepository)
@@ -31,24 +31,18 @@ class NpmBuildInfoIntegrationServiceImpl(
     }
 
     override fun integrateNpmBuildInfo(pluginConfig: PluginConfiguration) {
-        try {
-            logger.info("Integrate NPM build info into Maven build info for build ${pluginConfig.buildName}:${pluginConfig.buildNumber}")
+        logger.info("Integrate NPM build info into Maven build info for build ${pluginConfig.buildName}:${pluginConfig.buildNumber}")
 
-            val mavenBuildInfo = buildInfoService.getBuildInfo(pluginConfig.buildName, pluginConfig.buildNumber)
-            val npmBuildInfo = buildInfoService.getBuildInfo(pluginConfig.npmBuildName, pluginConfig.buildNumber)
-            val mergedBuildInfo = buildInfoService.mergeBuildInfo(mavenBuildInfo, npmBuildInfo)
-            buildInfoService.uploadBuildInfo(mergedBuildInfo)
+        val mavenBuildInfo = buildInfoService.getBuildInfo(pluginConfig.buildName, pluginConfig.buildNumber)
+        val npmBuildInfo = buildInfoService.getBuildInfo(pluginConfig.npmBuildName, pluginConfig.buildNumber)
+        val mergedBuildInfo = buildInfoService.mergeBuildInfo(mavenBuildInfo, npmBuildInfo)
+        buildInfoService.uploadBuildInfo(mergedBuildInfo)
 
-            if (pluginConfig.cleanupNpmBuildInfo) {
-                buildInfoService.deleteBuildInfo(pluginConfig.npmBuildName, listOf(pluginConfig.buildNumber))
-            }
-            
-            logger.info("NPM build info integration completed successfully!")
-        } catch (e: Exception) {
-            val errorMessage = "Unexpected error during NPM build info integration: ${e.message}"
-            logger.error(errorMessage, e)
-            throw MojoExecutionException(errorMessage, e)
+        if (pluginConfig.cleanupNpmBuildInfo) {
+            buildInfoService.deleteBuildInfo(pluginConfig.npmBuildName, listOf(pluginConfig.buildNumber))
         }
+
+        logger.info("NPM build info integration completed successfully!")
     }
 
 }

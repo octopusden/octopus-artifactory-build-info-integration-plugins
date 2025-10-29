@@ -1,7 +1,7 @@
 package org.octopusden.octopus.artifactory.npm.maven.plugin.service.impl
 
-import org.apache.maven.plugin.MojoExecutionException
 import org.octopusden.octopus.artifactory.npm.maven.plugin.configuration.ArtifactoryConfiguration
+import org.octopusden.octopus.artifactory.npm.maven.plugin.exception.JFrogCliException
 import org.octopusden.octopus.artifactory.npm.maven.plugin.service.CommandExecutorService
 import org.octopusden.octopus.artifactory.npm.maven.plugin.service.JFrogNpmCliService
 import org.slf4j.LoggerFactory
@@ -14,7 +14,6 @@ class JFrogNpmCliServiceImpl(
     
     companion object {
         private const val JFROG_CLI_COMMAND = "jfrog"
-        private const val JFROG_SERVER_ID = "jfrog-server"
     }
 
     override fun configureNpmRepository(packageJsonPath: String, npmRepository: String) {
@@ -26,9 +25,7 @@ class JFrogNpmCliServiceImpl(
         )
 
         if (!result.isSuccess()) {
-            throw MojoExecutionException(
-                "NPM repository configuration failed (exit ${result.exitCode}): ${result.errorOutput}"
-            )
+            throw JFrogCliException("NPM repository configuration failed", result.exitCode, result.errorOutput)
         }
 
         logger.info("NPM repository configured successfully")
@@ -43,9 +40,7 @@ class JFrogNpmCliServiceImpl(
         )
         
         if (!result.isSuccess()) {
-            throw MojoExecutionException(
-                "Failed to install NPM dependencies. Exit code: ${result.exitCode}, Error: ${result.errorOutput}"
-            )
+            throw JFrogCliException("Failed to install NPM dependencies", result.exitCode, result.errorOutput)
         }
 
         logger.info("NPM dependencies installed successfully with build info $buildName:$buildNumber")
@@ -71,7 +66,7 @@ class JFrogNpmCliServiceImpl(
         val result = commandExecutor.executeCommand(command, packageJsonPath)
         
         if (!result.isSuccess()) {
-            throw MojoExecutionException("Failed to publish NPM build info. Exit code: ${result.exitCode}, Error: ${result.errorOutput}")
+            throw JFrogCliException("Failed to publish NPM build info", result.exitCode, result.errorOutput)
         }
 
         logger.info("NPM build info ($buildName:$buildNumber) published successfully")

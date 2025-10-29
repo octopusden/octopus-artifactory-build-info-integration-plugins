@@ -2,19 +2,22 @@ package org.octopusden.octopus.artifactory.npm.maven.plugin
 
 import org.apache.maven.execution.MavenSession
 import org.apache.maven.plugin.AbstractMojo
-import org.apache.maven.plugin.MojoExecutionException
+import org.apache.maven.plugin.MojoFailureException
 import org.apache.maven.plugins.annotations.Mojo
 import org.apache.maven.plugins.annotations.Parameter
 import org.apache.maven.plugins.annotations.ResolutionScope
 import org.apache.maven.project.MavenProject
 import org.octopusden.octopus.artifactory.npm.maven.plugin.configuration.ArtifactoryConfiguration
 import org.octopusden.octopus.artifactory.npm.maven.plugin.configuration.PluginConfiguration
+import org.octopusden.octopus.artifactory.npm.maven.plugin.exception.ParameterValidationException
+import org.octopusden.octopus.artifactory.npm.maven.plugin.exception.PluginException
 import org.octopusden.octopus.artifactory.npm.maven.plugin.service.NpmBuildInfoIntegrationService
 import org.octopusden.octopus.artifactory.npm.maven.plugin.service.impl.ArtifactoryBuildInfoServiceImpl
 import org.octopusden.octopus.artifactory.npm.maven.plugin.service.impl.CommandExecutorServiceImpl
 import org.octopusden.octopus.artifactory.npm.maven.plugin.service.impl.JFrogNpmCliServiceImpl
 import org.octopusden.octopus.artifactory.npm.maven.plugin.service.impl.NpmBuildInfoIntegrationServiceImpl
-import org.octopusden.octopus.artifactory.npm.maven.plugin.utils.ParameterValidator
+import org.octopusden.octopus.artifactory.npm.maven.plugin.utils.ParameterValidator.validateArtifactoryUrl
+import org.octopusden.octopus.artifactory.npm.maven.plugin.utils.ParameterValidator.validatePackageJsonPath
 import org.octopusden.octopus.infrastructure.artifactory.client.ArtifactoryClassicClient
 import org.octopusden.octopus.infrastructure.artifactory.client.ArtifactoryClient
 import org.octopusden.octopus.infrastructure.client.commons.ClientParametersProvider
@@ -71,37 +74,50 @@ class ArtifactoryNpmMavenPluginMojo : AbstractMojo() {
     private lateinit var integrationService: NpmBuildInfoIntegrationService
 
     override fun execute() {
-        if (skip) {
-            log.info("Skipping NPM build info integration (artifactory.npm.skip=true)")
-            return
-        }
+        try {
+            if (skip) {
+                log.info("Skipping NPM build info integration (artifactory.npm.skip=true)")
+                return
+            }
 
-        log.info("Starting NPM build info integration for build $buildName:$buildNumber")
+            log.info("Starting NPM build info integration for build $buildName:$buildNumber")
 
-        validateParameters()
-        initializeServices()
-        val pluginConfiguration = PluginConfiguration(
-            buildName, buildNumber,
-            npmBuildNameSuffix, npmRepository,
-            File(project.basedir, packageJsonPath).absolutePath,
-            skip, cleanupNpmBuildInfo
-        )
-        val artifactoryConfiguration = ArtifactoryConfiguration(
-            artifactoryUrl, artifactoryUsername,
-            artifactoryPassword, artifactoryAccessToken
-        )
+            validateParameters()
+            initializeServices()
+            val pluginConfiguration = PluginConfiguration(
+                buildName, buildNumber,
+                npmBuildNameSuffix, npmRepository,
+                File(project.basedir, packageJsonPath).absolutePath,
+                skip, cleanupNpmBuildInfo
+            )
+            val artifactoryConfiguration = ArtifactoryConfiguration(
+                artifactoryUrl, artifactoryUsername,
+                artifactoryPassword, artifactoryAccessToken
+            )
 
-        integrationService.generateNpmBuildInfo(pluginConfiguration, artifactoryConfiguration)
+            integrationService.generateNpmBuildInfo(pluginConfiguration, artifactoryConfiguration)
 
-        val originalListener = session.request.executionListener
-        session.request.executionListener = ArtifactoryNpmBuildInfoListener(originalListener) {
-            integrationService.integrateNpmBuildInfo(pluginConfiguration)
+            val originalListener = session.request.executionListener
+            session.request.executionListener = ArtifactoryNpmBuildInfoListener(originalListener) {
+                integrationService.integrateNpmBuildInfo(pluginConfiguration)
+            }
+            
+        } catch (e: PluginException) {
+            val errorMessage = "NPM build info integration failed: ${e.message}"
+            log.error(errorMessage, e)
+            throw MojoFailureException(errorMessage, e)
+        } catch (e: MojoFailureException) {
+            throw e
+        } catch (e: Exception) {
+            val errorMessage = "Unexpected error during NPM build info integration: ${e.message}"
+            log.error(errorMessage, e)
+            throw MojoFailureException(errorMessage, e)
         }
     }
 
     private fun validateParameters() {
-        ParameterValidator.validateArtifactoryUrl(artifactoryUrl)
-        ParameterValidator.validatePackageJsonFile(File(project.basedir, packageJsonPath))
+        validateArtifactoryUrl(artifactoryUrl)
+        validatePackageJsonPath(File(project.basedir, packageJsonPath))
     }
 
     private fun initializeServices() {
@@ -121,7 +137,7 @@ class ArtifactoryNpmMavenPluginMojo : AbstractMojo() {
                 StandardBasicCredCredentialProvider(artifactoryUsername!!, artifactoryPassword!!)
 
             else ->
-                throw MojoExecutionException(
+                throw ParameterValidationException(
                     "Artifactory credentials are not properly configured. " +
                             "Please set `artifactoryAccessToken` or both `artifactoryUsername` and `artifactoryPassword`."
                 )

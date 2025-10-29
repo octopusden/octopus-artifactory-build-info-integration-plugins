@@ -1,6 +1,6 @@
 package org.octopusden.octopus.artifactory.npm.maven.plugin.service.impl
 
-import org.apache.maven.plugin.MojoExecutionException
+import org.octopusden.octopus.artifactory.npm.maven.plugin.exception.ArtifactoryException
 import org.octopusden.octopus.artifactory.npm.maven.plugin.service.ArtifactoryBuildInfoService
 import org.octopusden.octopus.infrastructure.artifactory.client.ArtifactoryClient
 import org.octopusden.octopus.infrastructure.artifactory.client.dto.Agent
@@ -22,7 +22,9 @@ class ArtifactoryBuildInfoServiceImpl(
             logger.info("Get build info $buildName:$buildNumber")
             artifactoryClient.getBuildInfo(buildName, buildNumber).buildInfo
         } catch (e: NotFoundException) {
-            throw MojoExecutionException("Build info not found for $buildName:$buildNumber. Please ensure the build info has been published.")
+            throw ArtifactoryException("Build info not found. Please ensure the build info has been published ($buildName:$buildNumber)", e)
+        } catch (e: ArtifactoryClientException) {
+            throw ArtifactoryException("Failed to retrieve build info from Artifactory", e)
         }
 
     override fun mergeBuildInfo(mavenBuildInfo: BuildInfo, npmBuildInfo: BuildInfo): BuildInfo {
@@ -49,7 +51,7 @@ class ArtifactoryBuildInfoServiceImpl(
             logger.info("Uploading build info ${buildInfo.name}:${buildInfo.number}")
             artifactoryClient.uploadBuildInfo(buildInfo)
         } catch (e: ArtifactoryClientException) {
-            throw MojoExecutionException("Error uploading build info ${buildInfo.name}:${buildInfo.number}", e)
+            throw ArtifactoryException("Error uploading build info ${buildInfo.name}:${buildInfo.number}", e)
         }
     }
 
@@ -58,7 +60,7 @@ class ArtifactoryBuildInfoServiceImpl(
             logger.info("Deleting build info for $buildName with numbers: $buildNumbers")
             artifactoryClient.deleteBuild(DeleteBuildRequest(buildName, buildNumbers))
         } catch (e: ArtifactoryClientException) {
-            throw MojoExecutionException("Error deleting build info for $buildName with numbers: $buildNumbers", e)
+            throw ArtifactoryException("Error deleting build info for $buildName with numbers: $buildNumbers", e)
         }
     }
 
