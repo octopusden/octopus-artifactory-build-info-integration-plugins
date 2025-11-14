@@ -18,6 +18,7 @@
     <description>Maven plugin that uploads NPM dependencies within a Maven project and includes them in the same build info</description>
     <url>https://github.com/octopusden/octopus-artifactory-npm-maven-plugin</url>
     <inceptionYear>2025</inceptionYear>
+
     <licenses>
         <license>
             <name>The GNU Lesser General Public License, Version 3.0</name>
@@ -25,6 +26,19 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+
+    <scm>
+        <connection>scm:git:https://github.com/octopusden/octopus-artifactory-npm-maven-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:octopusden/octopus-artifactory-npm-maven-plugin.git</developerConnection>
+        <url>https://github.com/octopusden/octopus-artifactory-npm-maven-plugin</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>octopus</id>
+            <name>octopus</name>
+        </developer>
+    </developers>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

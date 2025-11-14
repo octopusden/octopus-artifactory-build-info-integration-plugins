@@ -1,11 +1,16 @@
 name: Maven Release
 
-on: workflow_dispatch
+on:
+  repository_dispatch:
+    types: release-maven
 
 jobs:
-  build:
+  release:
     uses: octopusden/octopus-base/.github/workflows/common-java-maven-release.yml@v2.1.8
     with:
-      java-version: '21'
       flow-type: hybrid
+      java-version: '21'
+      commit-hash: ${{ github.event.client_payload.commit }}
+      build-version: ${{ github.event.client_payload.project_version }}
+      register-release-immediately: true
     secrets: inherit
