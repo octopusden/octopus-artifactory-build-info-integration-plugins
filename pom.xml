@@ -55,6 +55,8 @@
         <eclipse.sisu.plexus.version>0.3.5</eclipse.sisu.plexus.version>
         <slf4j.version>2.0.13</slf4j.version>
         <junit.version>5.11.3</junit.version>
+
+        <maven.test.skip>false</maven.test.skip>
     </properties>
 
     <dependencies>
@@ -157,6 +159,7 @@
                 <artifactId>docker-maven-plugin</artifactId>
                 <version>${docker.maven.plugin.version}</version>
                 <configuration>
+                    <skip>${maven.test.skip}</skip>
                     <autoCreateCustomNetworks>true</autoCreateCustomNetworks>
                     <images>
                         <image>
@@ -206,6 +209,7 @@
                 <artifactId>maven-invoker-plugin</artifactId>
                 <version>${maven.invoker.plugin.version}</version>
                 <configuration>
+                    <skipInvocation>${maven.test.skip}</skipInvocation>
                     <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
                     <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
                     <postBuildHookScript>verify</postBuildHookScript>
@@ -229,6 +233,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven.surefire.plugin.version}</version>
+                <configuration>
+                    <skipTests>${maven.test.skip}</skipTests>
+                </configuration>
                 <executions>
                     <execution>
                         <id>default-test</id>
