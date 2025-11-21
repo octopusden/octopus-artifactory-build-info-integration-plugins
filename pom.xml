@@ -50,13 +50,14 @@
         <maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
         <maven.compiler.plugin.version>3.14.1</maven.compiler.plugin.version>
         <docker.maven.plugin.version>0.43.4</docker.maven.plugin.version>
+        <dokka.version>2.1.0</dokka.version>
 
         <artifactory.client.version>2.0.75</artifactory.client.version>
         <eclipse.sisu.plexus.version>0.3.5</eclipse.sisu.plexus.version>
         <slf4j.version>2.0.13</slf4j.version>
         <junit.version>5.11.3</junit.version>
 
-        <maven.test.skip>false</maven.test.skip>
+        <skipITs>false</skipITs>
     </properties>
 
     <dependencies>
@@ -159,7 +160,7 @@
                 <artifactId>docker-maven-plugin</artifactId>
                 <version>${docker.maven.plugin.version}</version>
                 <configuration>
-                    <skip>${maven.test.skip}</skip>
+                    <skip>${skipITs}</skip>
                     <autoCreateCustomNetworks>true</autoCreateCustomNetworks>
                     <images>
                         <image>
@@ -209,7 +210,7 @@
                 <artifactId>maven-invoker-plugin</artifactId>
                 <version>${maven.invoker.plugin.version}</version>
                 <configuration>
-                    <skipInvocation>${maven.test.skip}</skipInvocation>
+                    <skipInvocation>${skipITs}</skipInvocation>
                     <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
                     <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
                     <postBuildHookScript>verify</postBuildHookScript>
@@ -234,7 +235,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven.surefire.plugin.version}</version>
                 <configuration>
-                    <skipTests>${maven.test.skip}</skipTests>
+                    <skipTests>${skipITs}</skipTests>
                 </configuration>
                 <executions>
                     <execution>
@@ -257,6 +258,22 @@
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jetbrains.dokka</groupId>
+                <artifactId>dokka-maven-plugin</artifactId>
+                <version>${dokka.version}</version>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>javadocJar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <jdkVersion>8</jdkVersion>
                 </configuration>
             </plugin>
         </plugins>
