@@ -38,7 +38,7 @@ class ArtifactoryBuildInfoServiceImpl(
             mavenBuildInfo.number,
             mavenBuildInfo.version,
             Agent("Octopus NPM Maven Plugin", ""),
-            BuildAgent("GENERIC", "2.0.0"),
+            BuildAgent("GENERIC", "2.66.0"),
             mavenBuildInfo.started,
             null,
             mergedModules,

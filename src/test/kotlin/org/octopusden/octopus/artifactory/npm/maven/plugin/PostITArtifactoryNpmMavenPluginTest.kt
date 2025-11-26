@@ -20,7 +20,7 @@ class PostITArtifactoryNpmMavenPluginTest {
     fun assertNpmMavenBuildInfoIntegration() {
         val buildInfo = artifactoryClient.getBuildInfo("test-artifactory-npm-maven-plugin", "1.0.0").buildInfo
 
-        assertEquals(BuildAgent("GENERIC", "2.0.0"), buildInfo.buildAgent)
+        assertEquals(BuildAgent("GENERIC", "2.66.0"), buildInfo.buildAgent)
         assertEquals(2, buildInfo.modules?.size)
 
         val mavenModule = buildInfo.modules?.find { it.type != "npm" }
