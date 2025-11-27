@@ -37,8 +37,8 @@ class ArtifactoryBuildInfoServiceImpl(
             mavenBuildInfo.name,
             mavenBuildInfo.number,
             mavenBuildInfo.version,
-            Agent("Octopus NPM Maven Plugin", ""),
-            BuildAgent("GENERIC", "2.66.0"),
+            Agent(NPM_BUILD_INFO_CI_AGENT_NAME, NPM_BUILD_INFO_AGENT_VERSION),
+            BuildAgent(NPM_BUILD_INFO_BUILD_AGENT_NAME, NPM_BUILD_INFO_AGENT_VERSION),
             mavenBuildInfo.started,
             null,
             mergedModules,
@@ -62,6 +62,12 @@ class ArtifactoryBuildInfoServiceImpl(
         } catch (e: ArtifactoryClientException) {
             throw ArtifactoryException("Error deleting build info for $buildName with numbers: $buildNumbers", e)
         }
+    }
+
+    companion object {
+        private const val NPM_BUILD_INFO_CI_AGENT_NAME = "jfrog-cli-go"
+        private const val NPM_BUILD_INFO_BUILD_AGENT_NAME = "GENERIC"
+        private const val NPM_BUILD_INFO_AGENT_VERSION = "2.66.0"
     }
 
 }
