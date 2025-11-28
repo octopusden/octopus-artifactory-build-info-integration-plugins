@@ -2,6 +2,7 @@ package org.octopusden.octopus.artifactory.npm.maven.plugin
 
 import org.junit.jupiter.api.Test
 import org.octopusden.octopus.infrastructure.artifactory.client.ArtifactoryClassicClient
+import org.octopusden.octopus.infrastructure.artifactory.client.dto.Agent
 import org.octopusden.octopus.infrastructure.artifactory.client.dto.BuildAgent
 import org.octopusden.octopus.infrastructure.client.commons.ClientParametersProvider
 import org.octopusden.octopus.infrastructure.client.commons.StandardBasicCredCredentialProvider
@@ -20,6 +21,7 @@ class PostITArtifactoryNpmMavenPluginTest {
     fun assertNpmMavenBuildInfoIntegration() {
         val buildInfo = artifactoryClient.getBuildInfo("test-artifactory-npm-maven-plugin", "1.0.0").buildInfo
 
+        assertEquals(Agent("jfrog-cli-go", "2.66.0"), buildInfo.agent)
         assertEquals(BuildAgent("GENERIC", "2.66.0"), buildInfo.buildAgent)
         assertEquals(2, buildInfo.modules?.size)
 
