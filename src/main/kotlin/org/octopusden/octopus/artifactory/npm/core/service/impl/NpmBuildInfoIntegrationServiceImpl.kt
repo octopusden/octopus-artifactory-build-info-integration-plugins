@@ -7,12 +7,13 @@ import org.octopusden.octopus.artifactory.npm.core.service.ArtifactoryBuildInfoS
 import org.octopusden.octopus.artifactory.npm.core.service.JFrogNpmCliService
 import org.octopusden.octopus.artifactory.npm.core.service.NpmBuildInfoIntegrationService
 import org.slf4j.LoggerFactory
+import java.util.concurrent.TimeUnit
 
 class NpmBuildInfoIntegrationServiceImpl(
     private val jfrogNpmCliService: JFrogNpmCliService,
     private val buildInfoService: ArtifactoryBuildInfoService
 ) : NpmBuildInfoIntegrationService {
-    
+
     private val logger = LoggerFactory.getLogger(NpmBuildInfoIntegrationServiceImpl::class.java)
 
     override fun generateNpmBuildInfo(
@@ -37,6 +38,13 @@ class NpmBuildInfoIntegrationServiceImpl(
         val mavenBuildInfo = buildInfoService.getBuildInfo(buildInfoConfig.buildName, buildInfoConfig.buildNumber)
         val npmBuildInfo = buildInfoService.getBuildInfo(buildInfoConfig.npmBuildName, buildInfoConfig.buildNumber)
         val mergedBuildInfo = buildInfoService.mergeBuildInfo(mavenBuildInfo, npmBuildInfo)
+
+        // TODO: Implement proper check for Xray scan status/availability before uploading merged build info to avoid race conditions
+        logger.warn(
+            "Waiting for $XRAY_INDEXING_WAIT_MINUTES minute(s) before uploading merged build info to prevent Xray indexing race condition"
+        )
+        Thread.sleep(TimeUnit.MINUTES.toMillis(XRAY_INDEXING_WAIT_MINUTES))
+
         buildInfoService.uploadBuildInfo(mergedBuildInfo)
 
         if (buildInfoConfig.cleanupNpmBuildInfo) {
@@ -44,6 +52,10 @@ class NpmBuildInfoIntegrationServiceImpl(
         }
 
         logger.info("NPM build info integration completed successfully!")
+    }
+
+    companion object {
+        private const val XRAY_INDEXING_WAIT_MINUTES = 1L
     }
 
 }
