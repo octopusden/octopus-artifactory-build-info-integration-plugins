@@ -31,7 +31,7 @@ class ArtifactoryBuildInfoServiceImpl(
         logger.info("Merging NPM build info (${npmBuildInfo.name}:${npmBuildInfo.number}) into Maven build info (${mavenBuildInfo.name}:${mavenBuildInfo.number})")
 
         val mergedModules = (mavenBuildInfo.modules?.toList() ?: emptyList()).toMutableList()
-        mergedModules += npmBuildInfo.modules?.toList() ?: emptyList()
+        mergedModules += npmBuildInfo.modules?.map { it.copy(artifacts = emptyList()) } ?: emptyList()
 
         return BuildInfo(
             mavenBuildInfo.name,
