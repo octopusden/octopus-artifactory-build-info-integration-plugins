@@ -26,11 +26,9 @@ class PostITArtifactoryNpmMavenPluginTest {
         assertEquals(BuildAgent("GENERIC", "2.66.0"), buildInfo.buildAgent)
         assertEquals(2, buildInfo.modules?.size)
 
-        val mavenModule = buildInfo.modules?.find { it.type != "npm" }
-        val npmModule = buildInfo.modules?.find { it.type == "npm" }
+        val mavenModule = assertNotNull(buildInfo.modules?.find { it.type != "npm" })
+        val npmModule = assertNotNull(buildInfo.modules?.find { it.type == "npm" })
 
-        assertNotNull(mavenModule)
-        assertNotNull(npmModule)
         assertEquals(1, mavenModule.artifacts?.size)
         assertEquals(0, npmModule.artifacts?.size)
         assertNull(mavenModule.dependencies)
