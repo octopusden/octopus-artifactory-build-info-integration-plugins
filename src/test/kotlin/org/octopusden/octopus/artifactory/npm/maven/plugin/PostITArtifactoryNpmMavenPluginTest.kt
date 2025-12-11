@@ -7,6 +7,7 @@ import org.octopusden.octopus.infrastructure.artifactory.client.dto.BuildAgent
 import org.octopusden.octopus.infrastructure.client.commons.ClientParametersProvider
 import org.octopusden.octopus.infrastructure.client.commons.StandardBasicCredCredentialProvider
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 class PostITArtifactoryNpmMavenPluginTest {
@@ -28,9 +29,13 @@ class PostITArtifactoryNpmMavenPluginTest {
         val mavenModule = buildInfo.modules?.find { it.type != "npm" }
         val npmModule = buildInfo.modules?.find { it.type == "npm" }
 
-        assertEquals(1, mavenModule?.artifacts?.size)
-        assertNull(mavenModule?.dependencies)
-        assertNull(npmModule?.artifacts)
-        assertEquals(3, npmModule?.dependencies?.size)
+        assertNotNull(mavenModule)
+        assertNotNull(npmModule)
+
+        assertEquals(1, mavenModule.artifacts?.size)
+        assertEquals(0, npmModule.artifacts?.size)
+        assertNull(mavenModule.dependencies)
+        assertNull(npmModule.artifacts)
+        assertEquals(3, npmModule.dependencies?.size)
     }
 }
