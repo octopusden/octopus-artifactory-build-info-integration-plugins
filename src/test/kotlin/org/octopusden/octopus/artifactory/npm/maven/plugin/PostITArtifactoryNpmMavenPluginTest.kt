@@ -31,11 +31,9 @@ class PostITArtifactoryNpmMavenPluginTest {
 
         assertNotNull(mavenModule)
         assertNotNull(npmModule)
-
         assertEquals(1, mavenModule.artifacts?.size)
         assertEquals(0, npmModule.artifacts?.size)
         assertNull(mavenModule.dependencies)
-        assertNull(npmModule.artifacts)
         assertEquals(3, npmModule.dependencies?.size)
     }
 }
