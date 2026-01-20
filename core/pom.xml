@@ -15,6 +15,29 @@
 
     <name>Artifactory NPM Core</name>
     <description>Core library for NPM and Artifactory build info integration</description>
+    <url>https://github.com/octopusden/octopus-artifactory-npm-maven-plugin</url>
+    <inceptionYear>2025</inceptionYear>
+
+    <licenses>
+        <license>
+            <name>The GNU Lesser General Public License, Version 3.0</name>
+            <url>http://www.gnu.org/licenses/lgpl-3.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:https://github.com/octopusden/octopus-artifactory-npm-maven-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:octopusden/octopus-artifactory-npm-maven-plugin.git</developerConnection>
+        <url>https://github.com/octopusden/octopus-artifactory-npm-maven-plugin</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>octopus</id>
+            <name>octopus</name>
+        </developer>
+    </developers>
 
     <dependencies>
         <dependency>
@@ -48,7 +71,14 @@
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.jetbrains.dokka</groupId>
+                <artifactId>dokka-maven-plugin</artifactId>
+            </plugin>
         </plugins>
     </build>
 </project>
-
