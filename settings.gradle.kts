@@ -4,5 +4,5 @@ plugins {
 
 rootProject.name = "octopus-artifactory-integration"
 
-include("maven-plugin")
 include("build-info-integration-core")
+include("octopus-artifactory-npm-maven-plugin")

@@ -12,20 +12,20 @@ dependencies {
     implementation("org.apache.maven.plugin-tools:maven-plugin-annotations:3.10.2")
 }
 
-tasks.register<Exec>("generatePluginDescriptor") {
-    dependsOn(tasks.named("classes"))
-
-    commandLine(
-        "/Users/aksetiyawan/MacOS/MAVEN/LATEST/bin/mvn",
-        "-B",
-        "-f", "${layout.buildDirectory}/pom.xml",
-        "org.apache.maven.plugins:maven-plugin-plugin:3.10.2:descriptor"
-    )
-}
-
-tasks.named("jar") {
-    dependsOn("generatePluginDescriptor")
-}
+//tasks.register<Exec>("generatePluginDescriptor") {
+//    dependsOn(tasks.named("classes"))
+//
+//    commandLine(
+//        "/Users/aksetiyawan/MacOS/MAVEN/LATEST/bin/mvn",
+//        "-B",
+//        "-f", "${layout.buildDirectory}/pom.xml",
+//        "org.apache.maven.plugins:maven-plugin-plugin:3.10.2:descriptor"
+//    )
+//}
+//
+//tasks.named("jar") {
+//    dependsOn("generatePluginDescriptor")
+//}
 
 publishing {
     publications {

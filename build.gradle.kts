@@ -9,7 +9,7 @@ plugins {
 }
 
 allprojects {
-    group = "org.octopusden.octopus.artifactory"
+    group = "org.octopusden.octopus"
     if (version == "unspecified") {
         version = "3.0-SNAPSHOT"
     }
