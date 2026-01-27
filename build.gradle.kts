@@ -47,17 +47,25 @@ subprojects {
     }
 
     java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(8))
+        }
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
         withJavadocJar()
         withSourcesJar()
-        JavaVersion.VERSION_21.let {
-            sourceCompatibility = it
-            targetCompatibility = it
-        }
     }
 
     kotlin {
-        compilerOptions.jvmTarget = JvmTarget.JVM_21
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_1_8)
+        }
     }
+
+    tasks.withType<JavaCompile>().configureEach {
+        options.release.set(8)
+    }
+
 
     idea.module {
         isDownloadJavadoc = true

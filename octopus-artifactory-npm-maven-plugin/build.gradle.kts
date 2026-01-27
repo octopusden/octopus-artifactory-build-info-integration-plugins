@@ -1,7 +1,7 @@
 description = "Maven plugin that uploads NPM dependencies within a Maven project and includes them in the same build info"
 
 dependencies {
-    implementation("org.octopusden.octopus.artifactory:build-info-integration-core:${project.version}")
+    implementation(project(":build-info-integration-core"))
     implementation("org.octopusden.octopus.octopus-external-systems-clients:artifactory-client:2.0.75")
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.0")
@@ -31,6 +31,11 @@ tasks.register<Exec>("generatePluginDescriptor") {
     )
 
     doFirst {
+        val buildDir = layout.buildDirectory.asFile.get()
+        if (!buildDir.exists()) {
+            buildDir.mkdirs()
+        }
+
         val pomContent = """
             <project xmlns="http://maven.apache.org/POM/4.0.0"
                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -71,8 +76,8 @@ tasks.register<Exec>("generatePluginDescriptor") {
     }
 }
 
-tasks.named("jar") {
-    dependsOn("generatePluginDescriptor")
+tasks.named("compileKotlin") {
+    finalizedBy("generatePluginDescriptor")
 }
 
 publishing {

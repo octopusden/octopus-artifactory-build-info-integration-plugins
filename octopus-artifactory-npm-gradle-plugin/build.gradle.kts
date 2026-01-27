@@ -5,7 +5,7 @@ plugins {
 description = "Gradle plugin for publishing NPM packages to Artifactory"
 
 dependencies {
-    implementation("org.octopusden.octopus.artifactory:build-info-integration-core:${project.version}")
+    implementation(project(":build-info-integration-core"))
     implementation("org.octopusden.octopus.octopus-external-systems-clients:artifactory-client:2.0.75")
     implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.0")
 
@@ -20,7 +20,7 @@ tasks.test {
 gradlePlugin {
     plugins {
         create("artifactoryNpmPlugin") {
-            id = "org.octopusden.octopus-artifactory-npm-gradle-plugin"
+            id = "org.octopusden.octopus.artifactory-npm-gradle-plugin"
             implementationClass = "org.octopusden.octopus.artifactory.npm.gradle.plugin.ArtifactoryNpmGradlePlugin"
             displayName = "Artifactory NPM Integration Plugin"
             description = project.description

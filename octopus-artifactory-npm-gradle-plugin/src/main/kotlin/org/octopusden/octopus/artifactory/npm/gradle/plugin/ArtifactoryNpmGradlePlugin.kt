@@ -10,8 +10,6 @@ class ArtifactoryNpmGradlePlugin : Plugin<Project> {
             ArtifactoryNpmExtension::class.java,
             project
         )
-
-        // Register tasks after project evaluation when all settings are configured
         project.afterEvaluate {
             extension.taskConfiguration.registerTasks()
             extension.taskConfiguration.configureBuildFinishedHook()
