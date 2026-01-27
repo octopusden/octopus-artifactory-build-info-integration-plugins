@@ -25,7 +25,7 @@ abstract class IntegrateNpmBuildInfoTask : BaseNpmBuildInfoTask() {
             val artifactoryConfiguration = createArtifactoryConfiguration()
 
             integrationService.generateNpmBuildInfo(
-                getPackageJsonFile().absolutePath,
+                packageJsonPath().absolutePath,
                 buildInfoConfiguration,
                 artifactoryConfiguration
             )
@@ -39,7 +39,7 @@ abstract class IntegrateNpmBuildInfoTask : BaseNpmBuildInfoTask() {
     }
 
     private fun validateParameters() {
-        val packageJsonFile = getPackageJsonFile()
+        val packageJsonFile = File(packageJsonPath(), "package.json")
         require(packageJsonFile.exists()) {
             "package.json not found at: ${packageJsonFile.absolutePath}"
         }
@@ -48,18 +48,12 @@ abstract class IntegrateNpmBuildInfoTask : BaseNpmBuildInfoTask() {
         }
     }
 
-    private fun getPackageJsonFile(): File {
+    private fun packageJsonPath(): File {
         val path = packageJsonPath.get()
-        val baseFile = if (path.isEmpty()) {
+        return if (path.isEmpty()) {
             project.projectDir
         } else {
             File(project.projectDir, path)
-        }
-
-        return if (baseFile.isDirectory) {
-            File(baseFile, "package.json")
-        } else {
-            baseFile
         }
     }
 

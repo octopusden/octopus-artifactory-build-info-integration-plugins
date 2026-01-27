@@ -38,7 +38,7 @@ class ArtifactoryBuildInfoServiceImpl(
             mavenBuildInfo.number,
             mavenBuildInfo.version,
             Agent(NPM_BUILD_INFO_CI_AGENT_NAME, NPM_BUILD_INFO_AGENT_VERSION),
-            BuildAgent(NPM_BUILD_INFO_BUILD_AGENT_NAME, NPM_BUILD_INFO_AGENT_VERSION),
+            mavenBuildInfo.buildAgent,
             mavenBuildInfo.started,
             null,
             mergedModules,
@@ -66,7 +66,6 @@ class ArtifactoryBuildInfoServiceImpl(
 
     companion object {
         private const val NPM_BUILD_INFO_CI_AGENT_NAME = "jfrog-cli-go"
-        private const val NPM_BUILD_INFO_BUILD_AGENT_NAME = "GENERIC"
         private const val NPM_BUILD_INFO_AGENT_VERSION = "2.66.0"
     }
 
