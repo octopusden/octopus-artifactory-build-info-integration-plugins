@@ -18,10 +18,6 @@ class ArtifactoryNpmTaskConfiguration(
             task.group = "artifactory"
             task.description = "Integrates NPM dependencies into Artifactory build info"
 
-            task.artifactoryUrl.set(settings.artifactoryUrl)
-            task.artifactoryAccessToken.set(settings.artifactoryAccessToken)
-            task.artifactoryUsername.set(settings.artifactoryUsername)
-            task.artifactoryPassword.set(settings.artifactoryPassword)
             task.npmRepository.set(settings.npmRepository)
             task.buildName.set(settings.buildName)
             task.buildNumber.set(settings.buildNumber)

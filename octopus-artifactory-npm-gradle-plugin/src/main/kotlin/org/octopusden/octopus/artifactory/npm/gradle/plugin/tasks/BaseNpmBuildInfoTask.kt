@@ -3,8 +3,9 @@ package org.octopusden.octopus.artifactory.npm.gradle.plugin.tasks
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.Internal
 import org.octopusden.octopus.artifactory.build.info.integration.configuration.ArtifactoryConfiguration
 import org.octopusden.octopus.artifactory.build.info.integration.configuration.BuildInfoConfiguration
 import org.octopusden.octopus.artifactory.build.info.integration.service.NpmBuildInfoIntegrationService
@@ -23,77 +24,22 @@ import java.io.File
 abstract class BaseNpmBuildInfoTask : DefaultTask() {
 
     @get:Input
-    abstract val artifactoryUrl: Property<String>
-
-    @get:Input
-    @get:Optional
-    abstract val artifactoryAccessToken: Property<String>
-
-    @get:Input
-    @get:Optional
-    abstract val artifactoryUsername: Property<String>
-
-    @get:Input
-    @get:Optional
-    abstract val artifactoryPassword: Property<String>
-
-    @get:Input
-    abstract val npmRepository: Property<String>
-
-    @get:Input
     abstract val buildName: Property<String>
 
     @get:Input
     abstract val buildNumber: Property<String>
 
     @get:Input
-    abstract val npmBuildNameSuffix: Property<String>
+    abstract val npmRepository: Property<String>
 
     @get:Input
-    abstract val packageJsonPath: Property<String>
+    abstract val npmBuildNameSuffix: Property<String>
 
     @get:Input
     abstract val cleanupNpmBuildInfo: Property<Boolean>
 
+    @get:Internal
     protected lateinit var integrationService: NpmBuildInfoIntegrationService
-
-    protected fun validateParameters() {
-        require(artifactoryUrl.isPresent) {
-            "artifactoryUrl must be configured"
-        }
-
-        require(buildName.isPresent) {
-            "buildName must be configured"
-        }
-
-        require(buildNumber.isPresent) {
-            "buildNumber must be configured"
-        }
-
-        val packageJsonFile = getPackageJsonFile()
-        require(packageJsonFile.exists()) {
-            "package.json not found at: ${packageJsonFile.absolutePath}"
-        }
-
-        require(packageJsonFile.isFile) {
-            "package.json path is not a file: ${packageJsonFile.absolutePath}"
-        }
-    }
-
-    protected fun getPackageJsonFile(): File {
-        val path = packageJsonPath.get()
-        val baseFile = if (path.isEmpty()) {
-            project.projectDir
-        } else {
-            File(project.projectDir, path)
-        }
-
-        return if (baseFile.isDirectory) {
-            File(baseFile, "package.json")
-        } else {
-            baseFile
-        }
-    }
 
     protected fun initializeServices() {
         val commandExecutor = CommandExecutorServiceImpl()
@@ -105,8 +51,8 @@ abstract class BaseNpmBuildInfoTask : DefaultTask() {
 
     protected fun createBuildInfoConfiguration(): BuildInfoConfiguration {
         return BuildInfoConfiguration(
-            buildName.get(),
-            buildNumber.get(),
+            getBuildName(),
+            getBuildNumber(),
             npmBuildNameSuffix.get(),
             npmRepository.get(),
             cleanupNpmBuildInfo.get()
@@ -115,32 +61,59 @@ abstract class BaseNpmBuildInfoTask : DefaultTask() {
 
     protected fun createArtifactoryConfiguration(): ArtifactoryConfiguration {
         return ArtifactoryConfiguration(
-            artifactoryUrl.get(),
-            artifactoryUsername.orNull,
-            artifactoryPassword.orNull,
-            artifactoryAccessToken.orNull
+            getArtifactoryUrl(),
+            getArtifactoryUsername(),
+            getArtifactoryPassword(),
+            getArtifactoryAccessToken()
         )
     }
 
     private fun createArtifactoryClient(): ArtifactoryClient {
         val credentialProvider: CredentialProvider = when {
-            artifactoryAccessToken.isPresent && artifactoryAccessToken.get().isNotBlank() ->
-                StandardBearerTokenCredentialProvider(artifactoryAccessToken.get())
+            getArtifactoryAccessToken() != null ->
+                StandardBearerTokenCredentialProvider(getArtifactoryAccessToken()!!)
 
-            artifactoryUsername.isPresent && artifactoryPassword.isPresent &&
-                    artifactoryUsername.get().isNotBlank() && artifactoryPassword.get().isNotBlank() ->
-                StandardBasicCredCredentialProvider(artifactoryUsername.get(), artifactoryPassword.get())
+            getArtifactoryUsername() != null && getArtifactoryPassword() != null ->
+                StandardBasicCredCredentialProvider(getArtifactoryUsername()!!, getArtifactoryPassword()!!)
 
             else ->
                 throw GradleException(
                     "Artifactory credentials are not properly configured. " +
-                            "Please set 'artifactoryAccessToken' or both 'artifactoryUsername' and 'artifactoryPassword'."
+                            "Please set system property 'artifactory.accessToken' or both 'artifactory.username' and 'artifactory.password'."
                 )
         }
 
         return ArtifactoryClassicClient(object : ClientParametersProvider {
-            override fun getApiUrl(): String = artifactoryUrl.get()
+            override fun getApiUrl(): String = getArtifactoryUrl()
             override fun getAuth(): CredentialProvider = credentialProvider
         })
     }
+
+    private fun getArtifactoryUrl(): String {
+        return getSystemProperty("artifactory.url")
+            ?: throw GradleException("System property 'artifactory.url' must be provided")
+    }
+
+    private fun getArtifactoryAccessToken(): String? = getSystemProperty("artifactory.accessToken")
+
+    private fun getArtifactoryUsername(): String? = getSystemProperty("artifactory.username")
+
+    private fun getArtifactoryPassword(): String? = getSystemProperty("artifactory.password")
+
+    private fun getSystemProperty(key: String): String? {
+        return System.getProperty(key)?.takeIf { it.isNotBlank() }
+    }
+
+    private fun getBuildName(): String = resolveBuildInfo("buildInfo.build.name", buildName)
+
+    private fun getBuildNumber(): String = resolveBuildInfo("buildInfo.build.number", buildNumber)
+
+    private fun resolveBuildInfo(
+        projectPropertyKey: String,
+        settingsProvider: Provider<String>
+    ): String =
+        (project.findProperty(projectPropertyKey) as? String)
+            ?.takeIf { it.isNotBlank() }
+            ?: settingsProvider.orNull
+            ?: throw GradleException("Build info parameter '$projectPropertyKey' is not provided")
 }

@@ -1,9 +1,15 @@
 package org.octopusden.octopus.artifactory.npm.gradle.plugin.tasks
 
 import org.gradle.api.GradleException
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
+import java.io.File
 
 abstract class IntegrateNpmBuildInfoTask : BaseNpmBuildInfoTask() {
+
+    @get:Input
+    abstract val packageJsonPath: Property<String>
 
     @TaskAction
     fun execute() {
@@ -31,4 +37,30 @@ abstract class IntegrateNpmBuildInfoTask : BaseNpmBuildInfoTask() {
             throw GradleException("Failed to integrate NPM build info", e)
         }
     }
+
+    private fun validateParameters() {
+        val packageJsonFile = getPackageJsonFile()
+        require(packageJsonFile.exists()) {
+            "package.json not found at: ${packageJsonFile.absolutePath}"
+        }
+        require(packageJsonFile.isFile) {
+            "package.json path is not a file: ${packageJsonFile.absolutePath}"
+        }
+    }
+
+    private fun getPackageJsonFile(): File {
+        val path = packageJsonPath.get()
+        val baseFile = if (path.isEmpty()) {
+            project.projectDir
+        } else {
+            File(project.projectDir, path)
+        }
+
+        return if (baseFile.isDirectory) {
+            File(baseFile, "package.json")
+        } else {
+            baseFile
+        }
+    }
+
 }

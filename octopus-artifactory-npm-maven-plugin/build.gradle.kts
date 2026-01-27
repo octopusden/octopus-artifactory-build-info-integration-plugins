@@ -23,7 +23,7 @@ tasks.register<Exec>("generatePluginDescriptor") {
     val outputDirectory = layout.buildDirectory.file("classes/kotlin/main").get().asFile.canonicalPath
 
     commandLine(
-        "mvn",
+        "/Users/aksetiyawan/MacOS/MAVEN/LATEST/bin/mvn",
         "-B",
         "-f", pomFile.canonicalPath,
         "-e",
