@@ -1,0 +1,77 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: postgres-template
+objects:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: ${DEPLOYMENT_PREFIX}-postgres-pvc
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 500Mi
+      volumeMode: Filesystem
+
+  - apiVersion: v1
+    kind: Pod
+    metadata:
+      name: ${DEPLOYMENT_PREFIX}-postgres
+      labels:
+        app.kubernetes.io/name: ${DEPLOYMENT_PREFIX}-postgres
+    spec:
+      restartPolicy: Never
+      activeDeadlineSeconds: ${{ACTIVE_DEADLINE_SECONDS}}
+      containers:
+        - name: postgres
+          image: ${DOCKER_REGISTRY}/postgres:11-alpine
+          env:
+            - name: POSTGRES_DB
+              value: artifactory
+            - name: POSTGRES_USER
+              value: artifactory
+            - name: POSTGRES_PASSWORD
+              value: secret
+          ports:
+            - containerPort: 5432
+              protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - exec pg_isready -U artifactory
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: ${DEPLOYMENT_PREFIX}-postgres-pvc
+
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: ${DEPLOYMENT_PREFIX}-postgres-service
+    spec:
+      ports:
+        - port: 5432
+          targetPort: 5432
+      selector:
+        app.kubernetes.io/name: ${DEPLOYMENT_PREFIX}-postgres
+      type: LoadBalancer
+
+parameters:
+  - name: DEPLOYMENT_PREFIX
+    description: Unique deployment prefix
+    required: true
+  - name: ACTIVE_DEADLINE_SECONDS
+    description: Active deadline seconds
+    required: true
+  - name: DOCKER_REGISTRY
+    description: Docker registry
+    required: true

@@ -1,5 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.net.InetAddress
 import java.time.Duration
+import java.util.zip.CRC32
 
 plugins {
     kotlin("jvm") version "2.0.0"
@@ -8,10 +10,17 @@ plugins {
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
 }
 
+val defaultVersion = "${
+    with(CRC32()) {
+        update(InetAddress.getLocalHost().hostName.toByteArray())
+        value
+    }
+}-SNAPSHOT"
+
 allprojects {
     group = "org.octopusden.octopus"
     if (version == "unspecified") {
-        version = "3.0-SNAPSHOT"
+        version = defaultVersion
     }
 }
 

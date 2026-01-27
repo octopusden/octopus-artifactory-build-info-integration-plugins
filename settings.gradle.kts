@@ -7,3 +7,4 @@ rootProject.name = "octopus-artifactory-integration"
 include("build-info-integration-core")
 include("octopus-artifactory-npm-maven-plugin")
 include("octopus-artifactory-npm-gradle-plugin")
+include("ft")
