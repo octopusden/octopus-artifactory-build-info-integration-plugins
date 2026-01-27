@@ -32,15 +32,15 @@ class MavenFunctionalTest {
     private val artifactoryClient = ArtifactoryClassicClient(object : ClientParametersProvider {
         override fun getApiUrl() = artifactoryUrl
         override fun getAuth() = StandardBasicCredCredentialProvider(
-            username = BaseFunctionalTest.ARTIFACTORY_USERNAME,
-            password = BaseFunctionalTest.ARTIFACTORY_PASSWORD
+            username = GradleFunctionalTest.ARTIFACTORY_USERNAME,
+            password = GradleFunctionalTest.ARTIFACTORY_PASSWORD
         )
     })
 
     @Test
     fun testSimpleProject() {
         val buildName = "simple-project-maven"
-        val buildNumber = "3.0.90"
+        val buildNumber = "3.0.91"
 
         assertBuildInfoNotFound(buildName, buildNumber)
 
@@ -73,7 +73,7 @@ class MavenFunctionalTest {
     @Test
     fun testMissingBuildInfoParameters() {
         val buildName = "simple-project-maven"
-        val buildNumber = "3.0.90"
+        val buildNumber = "3.0.100"
 
         assertBuildInfoNotFound(buildName, buildNumber)
 
@@ -141,4 +141,5 @@ class MavenFunctionalTest {
         assertTrue(instance.stdOut.any { Regex(errorMessage).containsMatchIn(it) })
         assertBuildInfoNotFound(buildName, buildNumber)
     }
+
 }

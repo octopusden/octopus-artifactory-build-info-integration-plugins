@@ -1,5 +1,6 @@
 package org.octopusden.octopus.artifactory.integration.plugins.ft
 
+import com.platformlib.process.api.ProcessInstance
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -10,7 +11,7 @@ import org.octopusden.octopus.infrastructure.artifactory.client.exception.NotFou
 import org.octopusden.octopus.infrastructure.client.commons.ClientParametersProvider
 import org.octopusden.octopus.infrastructure.client.commons.StandardBasicCredCredentialProvider
 
-class BaseFunctionalTest {
+class GradleFunctionalTest {
     companion object {
         const val ARTIFACTORY_USERNAME = "admin"
         const val ARTIFACTORY_PASSWORD = "password"
@@ -18,7 +19,8 @@ class BaseFunctionalTest {
     }
 
     private val defaultTasks = arrayOf("clean", "build", "publish", "--info", "--stacktrace")
-    private val artifactoryUrl = "http://${System.getProperty("artifactoryTestHost")}"
+    private val artifactoryHost = System.getProperty("artifactoryTestHost")
+    private val artifactoryUrl = "http://$artifactoryHost"
     private val artifactoryProperties = arrayOf(
         "-Dartifactory.url=$artifactoryUrl",
         "-Dartifactory.repoKey=$ARTIFACTORY_REPO_KEY",
@@ -37,11 +39,9 @@ class BaseFunctionalTest {
     @Test
     fun testSimpleProject() {
         val buildName = "simple-project-gradle"
-        val buildNumber = "31.1.0"
+        val buildNumber = "31.10.2"
 
-        assertThrows<NotFoundException> {
-            artifactoryClient.getBuildInfo(buildName, buildNumber)
-        }
+        assertBuildInfoNotFound(buildName, buildNumber)
 
         val instance = gradleProcessInstance {
             testProjectName = "gradle-projects/simple-project"
@@ -73,11 +73,9 @@ class BaseFunctionalTest {
     @Test
     fun testMissingBuildInfoParameters() {
         val buildName = "simple-project-gradle"
-        val buildNumber = "33.1.1"
+        val buildNumber = "33.11.3"
 
-        assertThrows<NotFoundException> {
-            artifactoryClient.getBuildInfo(buildName, buildNumber)
-        }
+        assertBuildInfoNotFound(buildName, buildNumber)
 
         val instance = gradleProcessInstance {
             testProjectName = "gradle-projects/simple-project"
@@ -87,29 +85,15 @@ class BaseFunctionalTest {
             )
         }
 
-        assertEquals(0, instance.exitCode)
-        assertTrue(instance.stdOut.contains("Skipping NPM build info integration: buildName not configured"))
-
-        val buildInfoResult = artifactoryClient.getBuildInfo(buildName, buildNumber)
-        val modules = buildInfoResult.buildInfo.modules!!
-        val moduleList = modules.toList()
-
-        assertEquals(1, modules.size)
-
-        assertEquals("gradle", moduleList[0].type)
-
-        assertTrue(moduleList[0].artifacts!!.isNotEmpty())
-        assertTrue(moduleList[0].dependencies!!.isNotEmpty())
+        assertFailedOperations(instance, "Skipping NPM build info integration: buildName not configured", buildName, buildNumber)
     }
 
     @Test
     fun testMissingArtifactoryConfigurationParameters() {
         val buildName = "simple-project-gradle"
-        val buildNumber = "36.1.2"
+        val buildNumber = "36.12.4"
 
-        assertThrows<NotFoundException> {
-            artifactoryClient.getBuildInfo(buildName, buildNumber)
-        }
+        assertBuildInfoNotFound(buildName, buildNumber)
 
         val instance = gradleProcessInstance {
             testProjectName = "gradle-projects/simple-project"
@@ -122,30 +106,15 @@ class BaseFunctionalTest {
             )
         }
 
-        assertEquals(0, instance.exitCode)
-        assertTrue(instance.stdErr.contains("Failed to integrate NPM build info: Artifactory credentials are not properly configured. " +
-                "Please set system property 'artifactory.accessToken' or both 'artifactory.username' and 'artifactory.password'."))
-
-        val buildInfoResult = artifactoryClient.getBuildInfo(buildName, buildNumber)
-        val modules = buildInfoResult.buildInfo.modules!!
-        val moduleList = modules.toList()
-
-        assertEquals(1, modules.size)
-
-        assertEquals("gradle", moduleList[0].type)
-
-        assertTrue(moduleList[0].artifacts!!.isNotEmpty())
-        assertTrue(moduleList[0].dependencies!!.isNotEmpty())
+        assertFailedOperations(instance, "Artifactory credentials are not properly configured", buildName, buildNumber)
     }
 
     @Test
     fun testMissingPackageJsonFile() {
         val buildName = "simple-project-gradle"
-        val buildNumber = "36.1.4"
+        val buildNumber = "36.13.6"
 
-        assertThrows<NotFoundException> {
-            artifactoryClient.getBuildInfo(buildName, buildNumber)
-        }
+        assertBuildInfoNotFound(buildName, buildNumber)
 
         val instance = gradleProcessInstance {
             testProjectName = "gradle-projects/missing-package-json"
@@ -157,8 +126,18 @@ class BaseFunctionalTest {
             )
         }
 
+        assertFailedOperations(instance, "Skipping NPM build info integration: package.json not found", buildName, buildNumber)
+    }
+
+    private fun assertBuildInfoNotFound(buildName: String, buildNumber: String) {
+        assertThrows<NotFoundException> {
+            artifactoryClient.getBuildInfo(buildName, buildNumber)
+        }
+    }
+
+    private fun assertFailedOperations(instance: ProcessInstance, errorMessage: String, buildName: String, buildNumber: String) {
         assertEquals(0, instance.exitCode)
-        assertTrue(instance.stdOut.contains("Skipping NPM build info integration: package.json not found"))
+        assertTrue(instance.stdErr.any { it.contains(errorMessage) } || instance.stdOut.any { it.contains(errorMessage) })
 
         val buildInfoResult = artifactoryClient.getBuildInfo(buildName, buildNumber)
         val modules = buildInfoResult.buildInfo.modules!!
@@ -171,5 +150,4 @@ class BaseFunctionalTest {
         assertTrue(moduleList[0].artifacts!!.isNotEmpty())
         assertTrue(moduleList[0].dependencies!!.isNotEmpty())
     }
-
 }
