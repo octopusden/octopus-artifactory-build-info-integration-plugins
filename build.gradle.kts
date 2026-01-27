@@ -43,9 +43,7 @@ subprojects {
 
     repositories {
         mavenCentral()
-        maven {
-            url = uri("https://repo.gradle.org/gradle/libs-releases")
-        }
+        gradlePluginPortal()
     }
 
     java {
