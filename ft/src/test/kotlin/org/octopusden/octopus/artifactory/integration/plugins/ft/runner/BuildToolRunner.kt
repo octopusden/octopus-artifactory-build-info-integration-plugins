@@ -11,7 +11,7 @@ import java.nio.file.Paths
 fun gradleProcessInstance(init: BuildToolConfig.() -> Unit): ProcessInstance {
     return buildToolProcessInstance {
         buildTool = BuildTool.GRADLE
-        defaultArguments = arrayOf("--no-daemon")
+        defaultArguments = listOf("--no-daemon")
         init()
     }
 }
@@ -54,7 +54,7 @@ private fun buildToolProcessInstance(init: BuildToolConfig.() -> Unit): ProcessI
         .defaultExtensionMapping()
         .workDirectory(projectPath)
         .processInstance { it.unlimited() }
-        .commandAndArguments(command, *config.defaultArguments)
+        .commandAndArguments(command, *config.defaultArguments.toTypedArray())
         .build()
         .execute(*arguments.toTypedArray())
         .toCompletableFuture()

@@ -4,50 +4,29 @@ import com.platformlib.process.api.ProcessInstance
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.octopusden.octopus.artifactory.integration.plugins.ft.runner.mavenProcessInstance
-import org.octopusden.octopus.infrastructure.artifactory.client.ArtifactoryClassicClient
-import org.octopusden.octopus.infrastructure.artifactory.client.exception.NotFoundException
-import org.octopusden.octopus.infrastructure.client.commons.ClientParametersProvider
-import org.octopusden.octopus.infrastructure.client.commons.StandardBasicCredCredentialProvider
 
-class MavenFunctionalTest {
+class MavenFunctionalTest: BaseFunctionalTest() {
 
-    companion object {
-        const val ARTIFACTORY_USERNAME = "admin"
-        const val ARTIFACTORY_PASSWORD = "password"
-        const val ARTIFACTORY_REPO_KEY = "example-repo-local"
-    }
-
-    private val defaultTasks = arrayOf("clean", "install", "deploy", "-X")
-    private val artifactoryHost = System.getProperty("artifactoryTestHost")
-    private val artifactoryUrl = "http://$artifactoryHost"
-    private val artifactoryProperties = arrayOf(
+    override val defaultTasks = listOf("clean", "install", "deploy", "-X")
+    override val artifactoryProperties = listOf(
         "-DartifactoryHost=$artifactoryHost",
         "-DartifactoryRepository=$ARTIFACTORY_REPO_KEY",
         "-DartifactoryUsername=$ARTIFACTORY_USERNAME",
         "-DartifactoryPassword=$ARTIFACTORY_PASSWORD"
     )
 
-    private val artifactoryClient = ArtifactoryClassicClient(object : ClientParametersProvider {
-        override fun getApiUrl() = artifactoryUrl
-        override fun getAuth() = StandardBasicCredCredentialProvider(
-            username = GradleFunctionalTest.ARTIFACTORY_USERNAME,
-            password = GradleFunctionalTest.ARTIFACTORY_PASSWORD
-        )
-    })
-
     @Test
     fun testSimpleProject() {
         val buildName = "simple-project-maven"
-        val buildNumber = "3.0.91"
+        val buildNumber = "3.0.911"
 
         assertBuildInfoNotFound(buildName, buildNumber)
 
         val instance = mavenProcessInstance {
             testProjectName = "maven-projects/simple-project"
             tasks = defaultTasks
-            additionalArguments = artifactoryProperties + arrayOf(
+            additionalArguments = artifactoryProperties + listOf(
                 "-Dversion=$buildNumber",
                 "-Dartifactory.build.name=$buildName",
                 "-Dartifactory.build.version=$buildNumber",
@@ -80,7 +59,7 @@ class MavenFunctionalTest {
         val instance = mavenProcessInstance {
             testProjectName = "maven-projects/missing-parameters"
             tasks = defaultTasks
-            additionalArguments = artifactoryProperties + arrayOf(
+            additionalArguments = artifactoryProperties + listOf(
                 "-Dversion=$buildNumber"
 
             )
@@ -99,7 +78,7 @@ class MavenFunctionalTest {
         val instance = mavenProcessInstance {
             testProjectName = "maven-projects/missing-parameters"
             tasks = defaultTasks
-            additionalArguments = arrayOf(
+            additionalArguments = listOf(
                 "-Dversion=$buildNumber",
                 "-Dartifactory.build.name=$buildName",
                 "-Dartifactory.build.version=$buildNumber",
@@ -120,7 +99,7 @@ class MavenFunctionalTest {
         val instance = mavenProcessInstance {
             testProjectName = "maven-projects/missing-package-json"
             tasks = defaultTasks
-            additionalArguments = artifactoryProperties + arrayOf(
+            additionalArguments = artifactoryProperties + listOf(
                 "-Dversion=$buildNumber",
                 "-Dartifactory.build.name=$buildName",
                 "-Dartifactory.build.version=$buildNumber"
@@ -130,13 +109,7 @@ class MavenFunctionalTest {
         assertFailedOperations(instance, "package.json not found in directory", buildName, buildNumber)
     }
 
-    private fun assertBuildInfoNotFound(buildName: String, buildNumber: String) {
-        assertThrows<NotFoundException> {
-            artifactoryClient.getBuildInfo(buildName, buildNumber)
-        }
-    }
-
-    private fun assertFailedOperations(instance: ProcessInstance, errorMessage: String, buildName: String, buildNumber: String) {
+    override fun assertFailedOperations(instance: ProcessInstance, errorMessage: String, buildName: String, buildNumber: String) {
         assertEquals(1, instance.exitCode)
         assertTrue(instance.stdOut.any { Regex(errorMessage).containsMatchIn(it) })
         assertBuildInfoNotFound(buildName, buildNumber)

@@ -4,37 +4,17 @@ import com.platformlib.process.api.ProcessInstance
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.assertThrows
 import org.octopusden.octopus.artifactory.integration.plugins.ft.runner.gradleProcessInstance
-import org.octopusden.octopus.infrastructure.artifactory.client.ArtifactoryClassicClient
-import org.octopusden.octopus.infrastructure.artifactory.client.exception.NotFoundException
-import org.octopusden.octopus.infrastructure.client.commons.ClientParametersProvider
-import org.octopusden.octopus.infrastructure.client.commons.StandardBasicCredCredentialProvider
 
-class GradleFunctionalTest {
-    companion object {
-        const val ARTIFACTORY_USERNAME = "admin"
-        const val ARTIFACTORY_PASSWORD = "password"
-        const val ARTIFACTORY_REPO_KEY = "example-repo-local"
-    }
+class GradleFunctionalTest: BaseFunctionalTest() {
 
-    private val defaultTasks = arrayOf("clean", "build", "publish", "--info", "--stacktrace")
-    private val artifactoryHost = System.getProperty("artifactoryTestHost")
-    private val artifactoryUrl = "http://$artifactoryHost"
-    private val artifactoryProperties = arrayOf(
+    override val defaultTasks = listOf("clean", "build", "publish", "--info", "--stacktrace")
+    override val artifactoryProperties = listOf(
         "-Dartifactory.url=$artifactoryUrl",
         "-Dartifactory.repoKey=$ARTIFACTORY_REPO_KEY",
         "-Dartifactory.username=$ARTIFACTORY_USERNAME",
         "-Dartifactory.password=$ARTIFACTORY_PASSWORD"
     )
-
-    private val artifactoryClient = ArtifactoryClassicClient(object : ClientParametersProvider {
-        override fun getApiUrl() = artifactoryUrl
-        override fun getAuth() = StandardBasicCredCredentialProvider(
-            username = ARTIFACTORY_USERNAME,
-            password = ARTIFACTORY_PASSWORD
-        )
-    })
 
     @Test
     fun testSimpleProject() {
@@ -46,7 +26,7 @@ class GradleFunctionalTest {
         val instance = gradleProcessInstance {
             testProjectName = "gradle-projects/simple-project"
             tasks = defaultTasks
-            additionalArguments = artifactoryProperties + arrayOf(
+            additionalArguments = artifactoryProperties + listOf(
                 "-Pversion=$buildNumber",
                 "-PbuildInfo.build.name=$buildName",
                 "-PbuildInfo.build.number=$buildNumber"
@@ -80,7 +60,7 @@ class GradleFunctionalTest {
         val instance = gradleProcessInstance {
             testProjectName = "gradle-projects/simple-project"
             tasks = defaultTasks
-            additionalArguments = artifactoryProperties + arrayOf(
+            additionalArguments = artifactoryProperties + listOf(
                 "-Pversion=$buildNumber"
             )
         }
@@ -98,7 +78,7 @@ class GradleFunctionalTest {
         val instance = gradleProcessInstance {
             testProjectName = "gradle-projects/simple-project"
             tasks = defaultTasks
-            additionalArguments = arrayOf(
+            additionalArguments = listOf(
                 "-Pversion=$buildNumber",
                 "-PbuildInfo.build.name=$buildName",
                 "-PbuildInfo.build.number=$buildNumber",
@@ -119,7 +99,7 @@ class GradleFunctionalTest {
         val instance = gradleProcessInstance {
             testProjectName = "gradle-projects/missing-package-json"
             tasks = defaultTasks
-            additionalArguments = artifactoryProperties + arrayOf(
+            additionalArguments = artifactoryProperties + listOf(
                 "-Pversion=$buildNumber",
                 "-PbuildInfo.build.name=$buildName",
                 "-PbuildInfo.build.number=$buildNumber",
@@ -129,13 +109,7 @@ class GradleFunctionalTest {
         assertFailedOperations(instance, "Skipping NPM build info integration: package.json not found", buildName, buildNumber)
     }
 
-    private fun assertBuildInfoNotFound(buildName: String, buildNumber: String) {
-        assertThrows<NotFoundException> {
-            artifactoryClient.getBuildInfo(buildName, buildNumber)
-        }
-    }
-
-    private fun assertFailedOperations(instance: ProcessInstance, errorMessage: String, buildName: String, buildNumber: String) {
+    override fun assertFailedOperations(instance: ProcessInstance, errorMessage: String, buildName: String, buildNumber: String) {
         assertEquals(0, instance.exitCode)
         assertTrue(instance.stdErr.any { it.contains(errorMessage) } || instance.stdOut.any { it.contains(errorMessage) })
 
@@ -150,4 +124,5 @@ class GradleFunctionalTest {
         assertTrue(moduleList[0].artifacts!!.isNotEmpty())
         assertTrue(moduleList[0].dependencies!!.isNotEmpty())
     }
+
 }
