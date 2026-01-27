@@ -77,6 +77,7 @@ dependencies {
     testImplementation(project(":octopus-artifactory-npm-gradle-plugin"))
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    testImplementation("org.octopusden.octopus.octopus-external-systems-clients:artifactory-client:2.0.75")
     testApi("com.platformlib:platformlib-process-local:0.1.4")
 }
 

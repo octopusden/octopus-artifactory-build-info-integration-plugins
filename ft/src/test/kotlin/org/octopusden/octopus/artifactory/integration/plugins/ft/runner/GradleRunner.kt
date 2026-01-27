@@ -12,24 +12,23 @@ import java.nio.file.Paths
 open class TestGradleDSL {
     lateinit var testProjectName: String
     var additionalArguments: Array<String> = arrayOf()
-    var additionalEnvVariables: Map<String, String> = mapOf()
     var tasks: Array<String> = arrayOf()
 }
 
-fun gradleProcessInstance(init: TestGradleDSL.() -> Unit): Pair<ProcessInstance, Path> {
+fun gradleProcessInstance(init: TestGradleDSL.() -> Unit): ProcessInstance {
     val testGradleDSL = TestGradleDSL()
     init.invoke(testGradleDSL)
 
-    val projectPath = getResourcePath("/${testGradleDSL.testProjectName}", "Test project")
+    val projectPath = getResourcePath("/${testGradleDSL.testProjectName}")
     if (!Files.isDirectory(projectPath)) {
         throw IllegalArgumentException("The specified project '${testGradleDSL.testProjectName}' hasn't been found at $projectPath")
     }
 
-    return Pair(ProcessBuilders
+    return ProcessBuilders
         .newProcessBuilder<ProcessBuilder>(LocalProcessSpec.LOCAL_COMMAND)
         .envVariables(mapOf(
             "JAVA_HOME" to System.getProperty("java.home")
-        ) + testGradleDSL.additionalEnvVariables)
+        ))
         .redirectStandardOutput(System.out)
         .redirectStandardError(System.err)
         .defaultExtensionMapping()
@@ -42,11 +41,11 @@ fun gradleProcessInstance(init: TestGradleDSL.() -> Unit): Pair<ProcessInstance,
                 "-Poctopus-artifactory-npm-gradle-plugin.version=${System.getProperty("octopusArtifactoryIntegrationPluginVersion")}",
             ) + testGradleDSL.tasks + testGradleDSL.additionalArguments).toTypedArray())
         .toCompletableFuture()
-        .join(), projectPath)
+        .join()
 }
 
-private fun getResourcePath(path: String, description: String): Path {
+private fun getResourcePath(path: String): Path {
     val resource = TestGradleDSL::class.java.getResource(path)
-        ?: error("$description '$path' not found in resources")
+        ?: error("'$path' not found in resources")
     return Paths.get(resource.toURI())
 }
