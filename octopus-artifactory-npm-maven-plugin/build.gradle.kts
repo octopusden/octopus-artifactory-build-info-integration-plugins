@@ -8,7 +8,6 @@ dependencies {
     implementation("org.eclipse.sisu:org.eclipse.sisu.plexus:0.9.0.M2")
     implementation("org.slf4j:slf4j-api:2.0.9")
 
-    // Maven plugin dependencies (provided scope)
     implementation("org.apache.maven:maven-plugin-api:3.9.6")
     implementation("org.apache.maven:maven-core:3.9.6")
     implementation("org.apache.maven.plugin-tools:maven-plugin-annotations:3.10.2")
@@ -17,13 +16,13 @@ dependencies {
 tasks.register<Exec>("generatePluginDescriptor") {
     val pomFile = layout.buildDirectory.file("pom.xml").get().asFile
     val pluginDescriptorFile = layout.buildDirectory.file("classes/kotlin/main/META-INF/maven/plugin.xml").get().asFile
-    val pluginHelpDescriptorFile = layout.buildDirectory.file("classes/kotlin/main/META-INF/maven/org.octopusden.octopus/octopus-artifactory-npm-maven-plugin/plugin-help.xml").get().asFile
+    val pluginHelpDescriptorFile = layout.buildDirectory.file("classes/kotlin/main/META-INF/maven/${project.group}/${project.name}/plugin-help.xml").get().asFile
 
     val directory = layout.buildDirectory.asFile.get().canonicalPath
     val outputDirectory = layout.buildDirectory.file("classes/kotlin/main").get().asFile.canonicalPath
 
     commandLine(
-        "/Users/aksetiyawan/MacOS/MAVEN/LATEST/bin/mvn",
+        "mvn",
         "-B",
         "-f", pomFile.canonicalPath,
         "-e",

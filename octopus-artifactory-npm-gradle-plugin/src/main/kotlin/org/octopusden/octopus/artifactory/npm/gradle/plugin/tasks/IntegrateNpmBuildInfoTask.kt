@@ -18,7 +18,6 @@ abstract class IntegrateNpmBuildInfoTask : BaseNpmBuildInfoTask() {
 
     internal fun integrateNpmBuildInfo() {
         try {
-            validateParameters()
             initializeServices()
 
             val buildInfoConfiguration = createBuildInfoConfiguration()
@@ -35,16 +34,6 @@ abstract class IntegrateNpmBuildInfoTask : BaseNpmBuildInfoTask() {
         } catch (e: Exception) {
             logger.error("Failed to integrate NPM build info: ${e.message}", e)
             throw GradleException("Failed to integrate NPM build info", e)
-        }
-    }
-
-    private fun validateParameters() {
-        val packageJsonFile = File(packageJsonPath(), "package.json")
-        require(packageJsonFile.exists()) {
-            "package.json not found at: ${packageJsonFile.absolutePath}"
-        }
-        require(packageJsonFile.isFile) {
-            "package.json path is not a file: ${packageJsonFile.absolutePath}"
         }
     }
 

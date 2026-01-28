@@ -5,9 +5,9 @@ import org.gradle.api.Project
 import javax.inject.Inject
 
 abstract class ArtifactoryNpmExtension @Inject constructor(
-    private val project: Project
+    project: Project
 ) {
-    internal val configuration: ArtifactoryNpmSettings = project.objects.newInstance(ArtifactoryNpmSettings::class.java)
+    private val configuration: ArtifactoryNpmSettings = project.objects.newInstance(ArtifactoryNpmSettings::class.java)
 
     internal val taskConfiguration: ArtifactoryNpmTaskConfiguration =
         ArtifactoryNpmTaskConfiguration(project, configuration)

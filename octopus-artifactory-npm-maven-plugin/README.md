@@ -43,3 +43,10 @@ This ensures integration happens after the Artifactory Maven plugin publishes it
 - Requires a local Artifactory instance running in Docker. 
 - Requires JFrog CLI installed and available.
 - Additional post verification test will be executed during `verify` phase to verify NPM module data is successfully appended to Artifactory build info.
+
+```shell
+oc create -n test-env -f /Users/aksetiyawan/dev/octopus/octopus-artifactory-npm-maven-plugin/ft/build/okd/postgres.yaml
+```
+```shell
+oc create -n test-env -f /Users/aksetiyawan/dev/octopus/octopus-artifactory-npm-maven-plugin/ft/build/okd/artifactory.yaml
+```

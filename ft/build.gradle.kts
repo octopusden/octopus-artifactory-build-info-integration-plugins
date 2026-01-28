@@ -23,7 +23,7 @@ ext {
         val undefinedProperties = mandatoryProperties.filter { (project.ext[it] as String).isBlank() }
         if (undefinedProperties.isNotEmpty()) {
             throw IllegalArgumentException(
-                "Start gradle build with" +
+                "Test will be executed, the following parameter(s) are required" +
                         (if (undefinedProperties.contains("dockerRegistry")) " -Pdocker.registry=..." else "") +
                         (if (undefinedProperties.contains("octopusGithubDockerRegistry")) " -Poctopus.github.docker.registry=..." else "") +
                         (if (undefinedProperties.contains("okdActiveDeadlineSeconds")) " -Pokd.active-deadline-seconds=..." else "") +
@@ -49,6 +49,8 @@ fun String.getPort() = when (this) {
 fun getOkdInternalHost(serviceName: String) = "${ocTemplate.getPod(serviceName)}-service:${serviceName.getPort()}"
 
 ocTemplate {
+    enabled.set("testPlatform".getExt() == "okd")
+
     workDir.set(layout.buildDirectory.dir("okd"))
     clusterDomain.set("okdClusterDomain".getExt())
     namespace.set("okdProject".getExt())

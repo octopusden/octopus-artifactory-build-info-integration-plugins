@@ -75,7 +75,6 @@ subprojects {
         options.release.set(8)
     }
 
-
     idea.module {
         isDownloadJavadoc = true
         isDownloadSources = true

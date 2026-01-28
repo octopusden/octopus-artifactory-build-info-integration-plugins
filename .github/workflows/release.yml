@@ -1,17 +1,15 @@
-name: Maven Release
+name: Gradle Release
 
 on:
   repository_dispatch:
-    types: release-maven
+    types: release
 
 jobs:
-  release:
-    uses: octopusden/octopus-base/.github/workflows/common-java-maven-release.yml@v2.1.9
+  build:
+    uses: octopusden/octopus-base/.github/workflows/common-java-gradle-release.yml@v2.1.8
     with:
       flow-type: hybrid
       java-version: '21'
       commit-hash: ${{ github.event.client_payload.commit }}
       build-version: ${{ github.event.client_payload.project_version }}
-      register-release-immediately: true
-      release-mvn-parameters: '-DskipITs=true'
     secrets: inherit
