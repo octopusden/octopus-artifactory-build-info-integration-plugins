@@ -71,6 +71,9 @@ class ArtifactoryNpmMavenPluginMojo : AbstractMojo() {
     @Parameter(property = "artifactory.npm.cleanup.build.info", defaultValue = "true")
     private var cleanupNpmBuildInfo: Boolean = true
 
+    @Parameter(property = "artifactory.npm.skip.wait.for.xray.scan", defaultValue = "false")
+    private var skipWaitForXrayScan: Boolean = false
+
     private lateinit var integrationService: NpmBuildInfoIntegrationService
 
     override fun execute() {
@@ -101,7 +104,7 @@ class ArtifactoryNpmMavenPluginMojo : AbstractMojo() {
 
             val originalListener = session.request.executionListener
             session.request.executionListener = ArtifactoryNpmBuildInfoListener(originalListener) {
-                integrationService.integrateNpmBuildInfo(buildInfoConfiguration)
+                integrationService.integrateNpmBuildInfo(buildInfoConfiguration, skipWaitForXrayScan)
             }
             
         } catch (e: CoreException) {

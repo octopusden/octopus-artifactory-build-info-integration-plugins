@@ -38,6 +38,9 @@ abstract class BaseNpmBuildInfoTask : DefaultTask() {
     @get:Input
     abstract val cleanupNpmBuildInfo: Property<Boolean>
 
+    @get:Input
+    abstract val skipWaitForXrayScan: Property<Boolean>
+
     @get:Internal
     protected lateinit var integrationService: NpmBuildInfoIntegrationService
 

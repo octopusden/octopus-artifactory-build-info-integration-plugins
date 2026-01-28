@@ -19,7 +19,7 @@ class MavenFunctionalTest: BaseFunctionalTest() {
     @Test
     fun testSimpleProject() {
         val buildName = "simple-project-maven"
-        val buildNumber = "3.0.911"
+        val buildNumber = "2.0.0"
 
         assertBuildInfoNotFound(buildName, buildNumber)
 
@@ -52,7 +52,7 @@ class MavenFunctionalTest: BaseFunctionalTest() {
     @Test
     fun testMissingBuildInfoParameters() {
         val buildName = "simple-project-maven"
-        val buildNumber = "3.0.100"
+        val buildNumber = "2.0.1"
 
         assertBuildInfoNotFound(buildName, buildNumber)
 
@@ -71,7 +71,7 @@ class MavenFunctionalTest: BaseFunctionalTest() {
     @Test
     fun testMissingArtifactoryConfigurationParameters() {
         val buildName = "simple-project-maven"
-        val buildNumber = "3.0.6"
+        val buildNumber = "2.0.2"
 
         assertBuildInfoNotFound(buildName, buildNumber)
 
@@ -92,7 +92,7 @@ class MavenFunctionalTest: BaseFunctionalTest() {
     @Test
     fun testMissingPackageJsonFile() {
         val buildName = "simple-project-maven"
-        val buildNumber = "3.0.6"
+        val buildNumber = "2.0.3"
 
         assertBuildInfoNotFound(buildName, buildNumber)
 

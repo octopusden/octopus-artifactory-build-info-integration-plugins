@@ -30,7 +30,7 @@ abstract class IntegrateNpmBuildInfoTask : BaseNpmBuildInfoTask() {
                 artifactoryConfiguration
             )
 
-            integrationService.integrateNpmBuildInfo(buildInfoConfiguration)
+            integrationService.integrateNpmBuildInfo(buildInfoConfiguration, skipWaitForXrayScan.get())
             logger.lifecycle("NPM build info integrated successfully")
         } catch (e: Exception) {
             logger.error("Failed to integrate NPM build info: ${e.message}", e)

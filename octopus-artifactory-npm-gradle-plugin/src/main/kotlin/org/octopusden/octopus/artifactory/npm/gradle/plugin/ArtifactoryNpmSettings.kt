@@ -10,6 +10,7 @@ abstract class ArtifactoryNpmSettings {
     abstract val packageJsonPath: Property<String>
     abstract val skip: Property<Boolean>
     abstract val cleanupNpmBuildInfo: Property<Boolean>
+    abstract val skipWaitForXrayScan: Property<Boolean>
 
     init {
         npmRepository.convention("npm")
@@ -17,5 +18,6 @@ abstract class ArtifactoryNpmSettings {
         packageJsonPath.convention("")
         skip.convention(false)
         cleanupNpmBuildInfo.convention(true)
+        skipWaitForXrayScan.convention(false)
     }
 }

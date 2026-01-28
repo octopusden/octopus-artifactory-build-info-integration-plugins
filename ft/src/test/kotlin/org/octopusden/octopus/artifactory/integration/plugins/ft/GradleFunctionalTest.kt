@@ -19,7 +19,7 @@ class GradleFunctionalTest: BaseFunctionalTest() {
     @Test
     fun testSimpleProject() {
         val buildName = "simple-project-gradle"
-        val buildNumber = "31.10.2"
+        val buildNumber = "2.0.0"
 
         assertBuildInfoNotFound(buildName, buildNumber)
 
@@ -53,7 +53,7 @@ class GradleFunctionalTest: BaseFunctionalTest() {
     @Test
     fun testMissingBuildInfoParameters() {
         val buildName = "simple-project-gradle"
-        val buildNumber = "33.11.3"
+        val buildNumber = "2.0.1"
 
         assertBuildInfoNotFound(buildName, buildNumber)
 
@@ -71,7 +71,7 @@ class GradleFunctionalTest: BaseFunctionalTest() {
     @Test
     fun testMissingArtifactoryConfigurationParameters() {
         val buildName = "simple-project-gradle"
-        val buildNumber = "36.12.4"
+        val buildNumber = "2.0.2"
 
         assertBuildInfoNotFound(buildName, buildNumber)
 
@@ -92,7 +92,7 @@ class GradleFunctionalTest: BaseFunctionalTest() {
     @Test
     fun testMissingPackageJsonFile() {
         val buildName = "simple-project-gradle"
-        val buildNumber = "36.13.6"
+        val buildNumber = "2.0.3"
 
         assertBuildInfoNotFound(buildName, buildNumber)
 

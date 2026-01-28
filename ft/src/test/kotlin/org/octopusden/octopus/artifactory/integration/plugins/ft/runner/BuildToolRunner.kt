@@ -66,4 +66,3 @@ private fun getResourcePath(path: String): Path {
         ?: error("'$path' not found in resources")
     return Paths.get(resource.toURI())
 }
-

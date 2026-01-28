@@ -15,7 +15,7 @@ abstract class BaseFunctionalTest {
         const val ARTIFACTORY_REPO_KEY = "example-repo-local"
     }
 
-    protected val artifactoryHost = System.getProperty("artifactoryTestHost")
+    protected val artifactoryHost: String = System.getProperty("artifactoryTestHost")
     protected val artifactoryUrl = "http://$artifactoryHost"
 
     abstract val defaultTasks: List<String>

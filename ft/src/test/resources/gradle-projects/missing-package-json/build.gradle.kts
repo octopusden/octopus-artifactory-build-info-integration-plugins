@@ -42,6 +42,7 @@ artifactory {
 artifactoryNpm {
     configuration {
         cleanupNpmBuildInfo.set(false)
+        skipWaitForXrayScan.set(true)
     }
 }
 

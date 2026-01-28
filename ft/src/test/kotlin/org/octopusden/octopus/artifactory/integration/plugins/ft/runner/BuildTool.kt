@@ -18,7 +18,6 @@ enum class BuildTool(
         },
         propertyPrefix = "-D"
     );
-
     fun buildPluginVersionProperty(version: String): String {
         val pluginName = when (this) {
             GRADLE -> "octopus-artifactory-npm-gradle-plugin"

@@ -32,18 +32,22 @@ class NpmBuildInfoIntegrationServiceImpl(
         jfrogNpmCliService.publishNpmBuildInfo(packageJsonPath, buildInfoConfig.npmBuildName, buildInfoConfig.buildNumber, artifactoryConfig)
     }
 
-    override fun integrateNpmBuildInfo(buildInfoConfig: BuildInfoConfiguration) {
+    override fun integrateNpmBuildInfo(buildInfoConfig: BuildInfoConfiguration, skipWaitForXrayScan: Boolean) {
         logger.info("Integrate NPM build info into Maven build info for build ${buildInfoConfig.buildName}:${buildInfoConfig.buildNumber}")
 
         val mavenBuildInfo = buildInfoService.getBuildInfo(buildInfoConfig.buildName, buildInfoConfig.buildNumber)
         val npmBuildInfo = buildInfoService.getBuildInfo(buildInfoConfig.npmBuildName, buildInfoConfig.buildNumber)
         val mergedBuildInfo = buildInfoService.mergeBuildInfo(mavenBuildInfo, npmBuildInfo)
 
-        // TODO: Implement proper check for Xray scan status/availability before uploading merged build info to avoid race conditions
-        logger.warn(
-            "Waiting for $XRAY_INDEXING_WAIT_MINUTES minute(s) before uploading merged build info to prevent Xray indexing race condition"
-        )
-        Thread.sleep(TimeUnit.MINUTES.toMillis(XRAY_INDEXING_WAIT_MINUTES))
+        if (skipWaitForXrayScan) {
+            logger.debug("Skipping wait for Xray indexing before uploading merged build info as per configuration")
+        } else {
+            // TODO: Implement proper check for Xray scan status/availability before uploading merged build info to avoid race conditions
+            logger.warn(
+                "Waiting for $XRAY_INDEXING_WAIT_MINUTES minute(s) before uploading merged build info to prevent Xray indexing race condition"
+            )
+            Thread.sleep(TimeUnit.MINUTES.toMillis(XRAY_INDEXING_WAIT_MINUTES))
+        }
 
         buildInfoService.uploadBuildInfo(mergedBuildInfo)
 

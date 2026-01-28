@@ -25,6 +25,7 @@ class ArtifactoryNpmTaskConfiguration(
             task.npmBuildNameSuffix.set(settings.npmBuildNameSuffix)
             task.packageJsonPath.set(settings.packageJsonPath)
             task.cleanupNpmBuildInfo.set(settings.cleanupNpmBuildInfo)
+            task.skipWaitForXrayScan.set(settings.skipWaitForXrayScan)
         }
     }
 

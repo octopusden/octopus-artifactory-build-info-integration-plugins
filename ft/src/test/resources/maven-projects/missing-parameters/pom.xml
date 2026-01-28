@@ -15,6 +15,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <artifactoryUrl>http://${artifactoryHost}</artifactoryUrl>
         <artifactory.npm.cleanup.build.info>false</artifactory.npm.cleanup.build.info>
+        <artifactory.npm.skip.wait.for.xray.scan>true</artifactory.npm.skip.wait.for.xray.scan>
         <altDeploymentRepository>test-artifactory::default::http://admin:password@${artifactoryHost}/artifactory/example-repo-local</altDeploymentRepository>
     </properties>
 
