@@ -1,5 +1,5 @@
 plugins {
-    id("org.octopusden.octopus.oc-template") version "1.0-SNAPSHOT"
+    id("org.octopusden.octopus.oc-template") version "2.0.5"
 }
 
 description = "Functional tests for Artifactory build info integration Maven and Gradle plugins"
