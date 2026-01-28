@@ -10,7 +10,7 @@ enum class BuildTool(
     GRADLE(
         commandResolver = { projectPath -> "$projectPath/gradlew" },
         propertyPrefix = "-P",
-        stagingProperty = "use_dev_repository=plugins"
+        stagingProperty = "-Puse_dev_repository=plugins"
     ),
     MAVEN(
         commandResolver = { _ ->
