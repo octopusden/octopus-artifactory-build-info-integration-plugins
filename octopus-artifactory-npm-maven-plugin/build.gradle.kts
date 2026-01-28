@@ -20,13 +20,14 @@ tasks.register<Exec>("generatePluginDescriptor") {
 
     val directory = layout.buildDirectory.asFile.get().canonicalPath
     val outputDirectory = layout.buildDirectory.file("classes/kotlin/main").get().asFile.canonicalPath
+    val mavenPluginToolsVersion = project.property("maven-plugin-tools.version")
 
     commandLine(
         "mvn",
         "-B",
         "-f", pomFile.canonicalPath,
         "-e",
-        "org.apache.maven.plugins:maven-plugin-plugin:3.10.2:descriptor"
+        "org.apache.maven.plugins:maven-plugin-plugin:${mavenPluginToolsVersion}:descriptor"
     )
 
     doFirst {

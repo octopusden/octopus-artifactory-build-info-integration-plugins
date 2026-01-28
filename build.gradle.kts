@@ -4,11 +4,11 @@ import java.time.Duration
 import java.util.zip.CRC32
 
 plugins {
-    kotlin("jvm") version "2.0.0"
+    kotlin("jvm")
     idea
     signing
-    id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
-    id("com.jfrog.artifactory") version "5.2.5"
+    id("io.github.gradle-nexus.publish-plugin")
+    id("com.jfrog.artifactory")
 }
 
 val defaultVersion = "${

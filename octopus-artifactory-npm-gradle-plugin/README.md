@@ -1,6 +1,20 @@
-# Artifactory NPM Gradle Plugin
+# octopus-artifactory-npm-gradle-plugin
+A Gradle plugin that integrates NPM dependency build information into an existing Gradle build info published to JFrog Artifactory.
 
-Gradle plugin that uploads NPM dependencies and includes them in Artifactory build info. This plugin executes automatically after the build finishes successfully.
+## Available Tasks
+### `integrateNpmBuildInfo`
+1. Collect NPM module information:
+    - Generate a temporary NPM build info using JFrog CLI.
+    - Extract the NPM module data from the NPM build info.
+2. Append the extracted NPM module data to the existing Gradle build info.
+3. Publish the updated Gradle build info to Artifactory.
+4. Clean up temporary NPM build info.
+
+**Automatic Execution:**
+- Automatically triggered after build finishes successfully
+- Only runs when required project properties (`buildInfo.build.name` and `buildInfo.build.number`) are present
+- Only configured if `package.json` file is found at the specified `packageJsonPath` (or project root if not specified)
+
 
 ## Usage
 
@@ -13,6 +27,7 @@ plugins {
     id("org.octopusden.octopus.artifactory-npm-gradle-plugin")
 }
 ```
+
 With `settings.gradle.kts`:
 
 ```kotlin
@@ -23,56 +38,15 @@ pluginManagement {
 }
 ```
 
-### Tasks
-The plugin provides the following task:
-- `integrateNpmBuildInfo`: 
-    1. Collect NPM module information:
-       - Generate a temporary NPM build info using JFrog CLI.
-       - Extract the NPM module data from the NPM build info.
-    2. Append the extracted NPM module data to the existing Maven build info.
-    3. Publish the updated Maven build info to Artifactory.
-    4. Clean up temporary NPM build info.
+### Required System Properties
 
-#### Task execution
-Task will be automatically triggered after build finished successfully, **only if** these following project properties are specified:
-- `buildInfo.build.name`
-- `buildInfo.build.number`
+Artifactory credentials and connection details must be provided as system properties:
 
-For `integrateNpmBuildInfo`, the task will only be configured if the `package.json` file is found at the specified `packageJsonPath` (or project root if not specified). 
-```kotlin
-artifactoryNpm {
-    settings {
-        packageJsonPath.set("path/to/package.json")
-    }
-}
-```
+### Required Project Properties
 
-Task can be skipped by specify configuration:
-```kotlin
-artifactoryNpm {
-    settings {
-        skip.set(true)
-    }
-}
-```
-
-
-### Provide Credentials via System Properties
-
-Artifactory credentials are **not** configured in build.gradle. Instead, provide them as system properties when running Gradle:
-
-```bash
-# Using access token
-./gradlew build \
-  -Dartifactory.url=https://artifactory.example.com \
-  -Dartifactory.accessToken=YOUR_TOKEN
-
-# OR using username/password
-./gradlew build \
-  -Dartifactory.url=https://artifactory.example.com \
-  -Dartifactory.username=YOUR_USERNAME \
-  -Dartifactory.password=YOUR_PASSWORD
-```
+The plugin automatically triggers **only if** these project properties are specified:
+- `buildInfo.build.name` - Gradle build info name to append
+- `buildInfo.build.number` - Gradle build info number to append
 
 ### Optional Configurations
 
@@ -102,3 +76,6 @@ artifactoryNpm {
     }
 }
 ```
+
+## Development Notes
+This plugin hooks into the Gradle build lifecycle and executes after the Artifactory Gradle plugin publishes its build info, ensuring the NPM dependencies are properly integrated into the final build information.

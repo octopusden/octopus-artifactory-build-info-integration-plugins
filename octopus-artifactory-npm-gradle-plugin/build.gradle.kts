@@ -6,10 +6,10 @@ description = "Gradle plugin for publishing NPM packages to Artifactory"
 
 dependencies {
     implementation(project(":build-info-integration-core"))
-    implementation("org.octopusden.octopus.octopus-external-systems-clients:artifactory-client:2.0.75")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.0")
+    implementation("org.octopusden.octopus.octopus-external-systems-clients:artifactory-client:${property("octopus-artifactory-client.version")}")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:${property("kotlin.version")}")
 
-    testImplementation(platform("org.junit:junit-bom:5.10.0"))
+    testImplementation(platform("org.junit:junit-bom:${property("junit.version")}"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
 

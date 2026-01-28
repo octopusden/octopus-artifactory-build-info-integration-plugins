@@ -1,6 +1,6 @@
 dependencies {
-    implementation("org.slf4j:slf4j-api:2.0.17")
-    implementation("org.octopusden.octopus.octopus-external-systems-clients:artifactory-client:2.0.75")
+    implementation("org.slf4j:slf4j-api:${property("slf4j.version")}")
+    implementation("org.octopusden.octopus.octopus-external-systems-clients:artifactory-client:${property("octopus-artifactory-client.version")}")
 }
 
 publishing {

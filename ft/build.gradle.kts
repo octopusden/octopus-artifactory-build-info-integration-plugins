@@ -1,5 +1,5 @@
 plugins {
-    id("org.octopusden.octopus.oc-template") version "2.0.5"
+    id("org.octopusden.octopus.oc-template")
 }
 
 description = "Functional tests for Artifactory build info integration Maven and Gradle plugins"
@@ -84,9 +84,9 @@ ocTemplate {
 dependencies {
     testImplementation(project(":octopus-artifactory-npm-maven-plugin"))
     testImplementation(project(":octopus-artifactory-npm-gradle-plugin"))
-    testImplementation("org.octopusden.octopus.octopus-external-systems-clients:artifactory-client:2.0.75")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
-    testApi("com.platformlib:platformlib-process-local:0.1.4")
+    testImplementation("org.octopusden.octopus.octopus-external-systems-clients:artifactory-client:${property("octopus-artifactory-client.version")}")
+    testImplementation("org.junit.jupiter:junit-jupiter:${property("junit.version")}")
+    testApi("com.platformlib:platformlib-process-local:${property("platformlib.version")}")
 }
 
 tasks.test {

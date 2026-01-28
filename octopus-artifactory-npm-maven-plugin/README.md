@@ -2,7 +2,8 @@
 A Maven plugin that integrates NPM dependency build information into an existing Maven build info published to JFrog artifactory.
 Primarily intended for Maven projects that also use NPM.
 
-### How it works
+### Available Mojo Goals
+#### `integrate-npm-build-info`
 1. Collect NPM module information:
     - Generate a temporary NPM build info using JFrog CLI.
     - Extract the NPM module data from the NPM build info.
@@ -37,16 +38,3 @@ Required properties:
 ### Development Notes
 This plugin uses a `MavenExecutionListener` and runs on the `sessionEnded` event.
 This ensures integration happens after the Artifactory Maven plugin publishes its build info (which occurs at the very end of the build lifecycle).
-
-### Testing
-- Integration tests are executed using the **Maven Invoker Plugin** during the `integration-test` phase.
-- Requires a local Artifactory instance running in Docker. 
-- Requires JFrog CLI installed and available.
-- Additional post verification test will be executed during `verify` phase to verify NPM module data is successfully appended to Artifactory build info.
-
-```shell
-oc create -n test-env -f /Users/aksetiyawan/dev/octopus/octopus-artifactory-npm-maven-plugin/ft/build/okd/postgres.yaml
-```
-```shell
-oc create -n test-env -f /Users/aksetiyawan/dev/octopus/octopus-artifactory-npm-maven-plugin/ft/build/okd/artifactory.yaml
-```
