@@ -45,32 +45,33 @@ nexusPublishing {
     }
 }
 
-artifactory {
-    publish {
-        val baseUrl = System.getenv().getOrDefault("ARTIFACTORY_URL", project.properties["artifactoryUrl"])
-        if (baseUrl != null) {
-            contextUrl = "$baseUrl/artifactory"
-        }
-        repository {
-            repoKey = "rnd-maven-dev-local"
-            username = System.getenv().getOrDefault("ARTIFACTORY_DEPLOYER_USERNAME", project.properties["NEXUS_USER"]).toString()
-            password = System.getenv().getOrDefault("ARTIFACTORY_DEPLOYER_PASSWORD", project.properties["NEXUS_PASSWORD"]).toString()
-        }
-        defaults {
-            publications("ALL_PUBLICATIONS")
-        }
-    }
-}
-
 subprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
     apply(plugin = "maven-publish")
     apply(plugin = "signing")
     apply(plugin = "idea")
+    apply(plugin = "com.jfrog.artifactory")
 
     repositories {
         mavenCentral()
         gradlePluginPortal()
+    }
+
+    artifactory {
+        publish {
+            val baseUrl = System.getenv().getOrDefault("ARTIFACTORY_URL", project.properties["artifactoryUrl"])
+            if (baseUrl != null) {
+                contextUrl = "$baseUrl/artifactory"
+            }
+            repository {
+                repoKey = "rnd-maven-dev-local"
+                username = System.getenv().getOrDefault("ARTIFACTORY_DEPLOYER_USERNAME", project.properties["NEXUS_USER"]).toString()
+                password = System.getenv().getOrDefault("ARTIFACTORY_DEPLOYER_PASSWORD", project.properties["NEXUS_PASSWORD"]).toString()
+            }
+            defaults {
+                publications("ALL_PUBLICATIONS")
+            }
+        }
     }
 
     java {
