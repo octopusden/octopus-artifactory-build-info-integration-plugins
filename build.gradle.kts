@@ -8,6 +8,7 @@ plugins {
     idea
     signing
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
+    id("com.jfrog.artifactory") version "5.2.5"
 }
 
 val defaultVersion = "${
@@ -41,6 +42,23 @@ nexusPublishing {
     transitionCheckOptions {
         maxRetries.set(60)
         delayBetween.set(Duration.ofSeconds(30))
+    }
+}
+
+artifactory {
+    publish {
+        val baseUrl = System.getenv().getOrDefault("ARTIFACTORY_URL", project.properties["artifactoryUrl"])
+        if (baseUrl != null) {
+            contextUrl = "$baseUrl/artifactory"
+        }
+        repository {
+            repoKey = "rnd-maven-dev-local"
+            username = System.getenv().getOrDefault("ARTIFACTORY_DEPLOYER_USERNAME", project.properties["NEXUS_USER"]).toString()
+            password = System.getenv().getOrDefault("ARTIFACTORY_DEPLOYER_PASSWORD", project.properties["NEXUS_PASSWORD"]).toString()
+        }
+        defaults {
+            publications("ALL_PUBLICATIONS")
+        }
     }
 }
 

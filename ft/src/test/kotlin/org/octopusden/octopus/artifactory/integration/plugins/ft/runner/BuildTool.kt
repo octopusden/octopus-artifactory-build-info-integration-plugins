@@ -4,11 +4,13 @@ import java.nio.file.Path
 
 enum class BuildTool(
     val commandResolver: (Path) -> String,
-    val propertyPrefix: String
+    val propertyPrefix: String,
+    val stagingProperty: String
 ) {
     GRADLE(
         commandResolver = { projectPath -> "$projectPath/gradlew" },
-        propertyPrefix = "-P"
+        propertyPrefix = "-P",
+        stagingProperty = "use_dev_repository=plugins"
     ),
     MAVEN(
         commandResolver = { _ ->
@@ -16,7 +18,8 @@ enum class BuildTool(
                 ?: System.getenv("M2_HOME")?.let { "$it/bin/mvn" }
                 ?: "mvn"
         },
-        propertyPrefix = "-D"
+        propertyPrefix = "-D",
+        stagingProperty = "-Pstaging"
     );
     fun buildPluginVersionProperty(version: String): String {
         val pluginName = when (this) {

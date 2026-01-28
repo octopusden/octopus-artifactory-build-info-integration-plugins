@@ -44,6 +44,7 @@ private fun buildToolProcessInstance(init: BuildToolConfig.() -> Unit): ProcessI
         add(pluginVersionProperty)
         addAll(config.tasks)
         addAll(config.additionalArguments)
+        addAll(config.buildTool.stagingProperty.let { listOf(it) })
     }
 
     return ProcessBuilders
