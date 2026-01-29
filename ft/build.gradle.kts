@@ -6,12 +6,12 @@ description = "Functional tests for Artifactory build info integration Maven and
 
 ext {
     System.getenv().let { it ->
-        set("testPlatform", it.getOrDefault("TEST_PLATFORM", properties["test.platform"]))
-        set("dockerRegistry", System.getenv().getOrDefault("DOCKER_REGISTRY", project.properties["docker.registry"]))
-        set("okdActiveDeadlineSeconds", it.getOrDefault("OKD_ACTIVE_DEADLINE_SECONDS", properties["okd.active-deadline-seconds"]))
-        set("okdProject", it.getOrDefault("OKD_PROJECT", properties["okd.project"]))
-        set("okdClusterDomain", it.getOrDefault("OKD_CLUSTER_DOMAIN", properties["okd.cluster-domain"]))
-        set("okdWebConsoleUrl", (it.getOrDefault("OKD_WEB_CONSOLE_URL", properties["okd.web-console-url"]) as String).trimEnd('/'))
+        set("testPlatform", (it["TEST_PLATFORM"] ?: project.findProperty("test.platform") as? String).orEmpty())
+        set("dockerRegistry", (System.getenv("DOCKER_REGISTRY") ?: project.findProperty("docker.registry") as? String).orEmpty())
+        set("okdActiveDeadlineSeconds", (it["OKD_ACTIVE_DEADLINE_SECONDS"] ?: project.findProperty("okd.active-deadline-seconds") as? String).orEmpty())
+        set("okdProject", (it["OKD_PROJECT"] ?: project.findProperty("okd.project") as? String).orEmpty())
+        set("okdClusterDomain", (it["OKD_CLUSTER_DOMAIN"] ?: project.findProperty("okd.cluster-domain") as? String).orEmpty())
+        set("okdWebConsoleUrl", (it["OKD_WEB_CONSOLE_URL"] ?: project.findProperty("okd.web-console-url") as? String).orEmpty().trimEnd('/'))
 
         val supportedTestPlatforms = listOf("okd")
         val testPlatform = "testPlatform".getExt()
@@ -40,7 +40,7 @@ ext {
     }
 }
 
-fun String.getExt() = project.ext[this] as String
+fun String.getExt() = (project.ext[this] as? String).orEmpty()
 fun String.getPort() = when (this) {
     "artifactory" -> 8081
     "postgres" -> 5432

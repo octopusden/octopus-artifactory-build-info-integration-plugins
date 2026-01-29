@@ -2,8 +2,8 @@
 A Maven plugin that integrates NPM dependency build information into an existing Maven build info published to JFrog artifactory.
 Primarily intended for Maven projects that also use NPM.
 
-### Available Mojo Goals
-#### `integrate-npm-build-info`
+## Available Mojo Goals
+### `integrate-npm-build-info`
 1. Collect NPM module information:
     - Generate a temporary NPM build info using JFrog CLI.
     - Extract the NPM module data from the NPM build info.
@@ -11,7 +11,7 @@ Primarily intended for Maven projects that also use NPM.
 3. Publish the updated Maven build info to Artifactory.
 4. Clean up temporary NPM build info.
 
-### Usage
+## Usage
 Add the plugin to your `pom.xml`:
 ```xml
 <plugin>
@@ -35,6 +35,6 @@ Required properties:
 - `artifactory.build.name` - Maven build info name to append
 - `artifactory.build.version` - Maven build info version to append
 
-### Development Notes
+## Development Notes
 This plugin uses a `MavenExecutionListener` and runs on the `sessionEnded` event.
 This ensures integration happens after the Artifactory Maven plugin publishes its build info (which occurs at the very end of the build lifecycle).
