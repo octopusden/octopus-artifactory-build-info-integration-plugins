@@ -23,11 +23,10 @@ allprojects {
     if (version == "unspecified") {
         version = defaultVersion
     }
-}
-
-repositories {
-    mavenCentral()
-    gradlePluginPortal()
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
 }
 
 nexusPublishing {
@@ -51,11 +50,6 @@ subprojects {
     apply(plugin = "signing")
     apply(plugin = "idea")
     apply(plugin = "com.jfrog.artifactory")
-
-    repositories {
-        mavenCentral()
-        gradlePluginPortal()
-    }
 
     artifactory {
         publish {
