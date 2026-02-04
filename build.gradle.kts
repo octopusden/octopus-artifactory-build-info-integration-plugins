@@ -74,20 +74,12 @@ subprojects {
         toolchain {
             languageVersion.set(JavaLanguageVersion.of(8))
         }
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
         withJavadocJar()
         withSourcesJar()
     }
 
     kotlin {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_1_8)
-        }
-    }
-
-    tasks.withType<JavaCompile>().configureEach {
-        options.release.set(8)
+        jvmToolchain(8)
     }
 
     idea.module {
