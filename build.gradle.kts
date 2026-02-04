@@ -11,12 +11,10 @@ plugins {
     id("com.jfrog.artifactory")
 }
 
-val defaultVersion = "${
-    with(CRC32()) {
-        update(InetAddress.getLocalHost().hostName.toByteArray())
-        value
-    }
-}-SNAPSHOT"
+val defaultVersion = run {
+    val host = runCatching { InetAddress.getLocalHost().hostName }.getOrNull() ?: "local"
+    "${CRC32().apply { update(host.toByteArray()) }.value}-SNAPSHOT"
+}
 
 allprojects {
     group = "org.octopusden.octopus"
