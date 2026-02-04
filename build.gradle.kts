@@ -86,8 +86,8 @@ subprojects {
     }
 
     ext {
-        System.getenv().let {
-            set("signingRequired", it.containsKey("ORG_GRADLE_PROJECT_signingKey") && it.containsKey("ORG_GRADLE_PROJECT_signingPassword"))
-        }
+        val signingRequired = listOf("ORG_GRADLE_PROJECT_signingKey", "ORG_GRADLE_PROJECT_signingPassword")
+            .all { System.getenv().containsKey(it) && !System.getenv(it).isNullOrBlank() }
+        set("signingRequired", signingRequired)
     }
 }
