@@ -14,6 +14,8 @@ dependencies {
 }
 
 tasks.register<Exec>("generatePluginDescriptor") {
+    dependsOn(tasks.named("compileKotlin"))
+
     val pomFile = layout.buildDirectory.file("pom.xml").get().asFile
     val pluginDescriptorFile = layout.buildDirectory.file("classes/kotlin/main/META-INF/maven/plugin.xml").get().asFile
     val pluginHelpDescriptorFile = layout.buildDirectory.file("classes/kotlin/main/META-INF/maven/${project.group}/${project.name}/plugin-help.xml").get().asFile
@@ -76,8 +78,8 @@ tasks.register<Exec>("generatePluginDescriptor") {
     }
 }
 
-tasks.named("compileKotlin") {
-    finalizedBy("generatePluginDescriptor")
+tasks.named("processResources") {
+    dependsOn("generatePluginDescriptor")
 }
 
 publishing {
