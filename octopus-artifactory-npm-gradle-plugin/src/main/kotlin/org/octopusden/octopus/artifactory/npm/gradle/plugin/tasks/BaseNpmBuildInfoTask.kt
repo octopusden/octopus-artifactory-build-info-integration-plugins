@@ -117,6 +117,6 @@ abstract class BaseNpmBuildInfoTask : DefaultTask() {
     ): String =
         (project.findProperty(projectPropertyKey) as? String)
             ?.takeIf { it.isNotBlank() }
-            ?: settingsProvider.orNull
+            ?: settingsProvider.orNull?.takeIf { it.isNotBlank() }
             ?: throw GradleException("Build info parameter '$projectPropertyKey' is not provided")
 }

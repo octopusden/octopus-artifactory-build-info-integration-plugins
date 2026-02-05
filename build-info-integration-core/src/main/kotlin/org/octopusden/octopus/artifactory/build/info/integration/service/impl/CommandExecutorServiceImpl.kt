@@ -27,7 +27,7 @@ class CommandExecutorServiceImpl : CommandExecutorService {
                 val env = processBuilder.environment()
                 for ((key, value) in environmentVariables) {
                     env[key] = value
-                    logger.debug("Setting environment variable: $key=$value")
+                    logger.debug("Setting environment variable $key")
                 }
             }
 
