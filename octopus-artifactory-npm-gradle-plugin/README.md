@@ -65,8 +65,8 @@ artifactoryNpm {
         // Optional: NPM build name suffix (default: "_npm")
         npmBuildNameSuffix.set("_npm")
         
-        // Optional: Path to package.json (default: project root)
-        packageJsonPath.set("") // or "path/to/package.json"
+        // Optional: Directory path of package.json (default: project root)
+        packageJsonPath.set("") // or "src/frontend" if package.json is located in src/frontend
         
         // Optional: Skip plugin execution (default: false)
         skip.set(false)
