@@ -39,11 +39,11 @@ abstract class IntegrateNpmBuildInfoTask : BaseNpmBuildInfoTask() {
 
     private fun packageJsonPath(): File {
         val path = packageJsonPath.get()
-        return if (path.isEmpty()) {
-            project.projectDir
-        } else {
-            File(project.projectDir, path)
+        val dir = if (path.isEmpty()) project.projectDir else File(project.projectDir, path)
+        if (!dir.isDirectory) {
+            throw GradleException("packageJsonPath must be a directory: ${dir.absolutePath}")
         }
+        return dir
     }
 
 }

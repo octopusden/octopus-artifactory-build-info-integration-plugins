@@ -30,7 +30,7 @@ gradlePlugin {
 
 publishing {
     publications {
-        create<MavenPublication>("pluginMaven") {
+        named<MavenPublication>("pluginMaven") {
             pom {
                 name.set("Artifactory NPM Gradle Plugin")
                 description.set("Gradle plugin that uploads NPM dependencies and includes them in Artifactory build info")

@@ -49,21 +49,26 @@ class JFrogNpmCliServiceImpl(
     override fun publishNpmBuildInfo(packageJsonPath: String, buildName: String, buildNumber: String, artifactoryConfig: ArtifactoryConfiguration) {
         logger.info("Publishing NPM build info...")
 
-        val command: List<String> = buildList {
-            addAll(listOf(JFROG_CLI_COMMAND, "rt", "build-publish", buildName, buildNumber, "--url", artifactoryConfig.url))
-            when {
-                artifactoryConfig.username != null && artifactoryConfig.password != null -> {
-                    logger.info("Using username/password authentication for publishing build info via JFrog CLI")
-                    addAll(listOf("--user", artifactoryConfig.username, "--password", artifactoryConfig.password))
-                }
-                artifactoryConfig.token != null -> {
-                    logger.info("Using token-based authentication for publishing build info via JFrog CLI")
-                    addAll(listOf("--access-token", artifactoryConfig.token))
-                }
+        val command = listOf(
+            JFROG_CLI_COMMAND, "rt", "build-publish",
+            buildName, buildNumber,
+            "--url", artifactoryConfig.url
+        )
+
+        val env = mutableMapOf<String, String>()
+        when {
+            artifactoryConfig.token != null -> {
+                logger.info("Using token-based authentication for publishing build info via JFrog CLI")
+                env["JFROG_CLI_ACCESS_TOKEN"] = artifactoryConfig.token
+            }
+            artifactoryConfig.username != null && artifactoryConfig.password != null -> {
+                logger.info("Using username/password authentication for publishing build info via JFrog CLI")
+                env["JFROG_CLI_USER"] = artifactoryConfig.username
+                env["JFROG_CLI_PASSWORD"] = artifactoryConfig.password
             }
         }
-        
-        val result = commandExecutor.executeCommand(command, packageJsonPath)
+
+        val result = commandExecutor.executeCommand(command, packageJsonPath, env)
         
         if (!result.isSuccess()) {
             throw JFrogCliException("Failed to publish NPM build info", result.exitCode, result.errorOutput)
