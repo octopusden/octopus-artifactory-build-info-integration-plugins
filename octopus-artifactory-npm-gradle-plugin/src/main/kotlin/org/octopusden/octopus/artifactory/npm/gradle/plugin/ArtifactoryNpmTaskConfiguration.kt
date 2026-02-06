@@ -70,17 +70,12 @@ class ArtifactoryNpmTaskConfiguration(
 
     private fun isPackageJsonAvailable(): Boolean {
         val path = settings.packageJsonPath.get()
-        val packageJsonFile = if (path.isEmpty()) {
-            File(project.projectDir, "package.json")
+        val packageJsonDir = if (path.isEmpty()) {
+            project.projectDir
         } else {
-            val baseFile = File(project.projectDir, path)
-            if (baseFile.isDirectory) {
-                File(baseFile, "package.json")
-            } else {
-                baseFile
-            }
+            File(project.projectDir, path)
         }
-
+        val packageJsonFile = File(packageJsonDir, "package.json")
         return packageJsonFile.exists() && packageJsonFile.isFile
     }
 }
