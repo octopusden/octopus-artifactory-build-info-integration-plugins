@@ -25,7 +25,7 @@ tasks.register<Exec>("generatePluginDescriptor") {
     val mavenPluginToolsVersion = project.property("maven-plugin-tools.version")
 
     commandLine(
-        "mvn",
+        "/Users/aksetiyawan/MacOS/MAVEN/LATEST/bin/mvn",
         "-B",
         "-f", pomFile.canonicalPath,
         "-e",
@@ -90,7 +90,7 @@ publishing {
             pom {
                 name.set("Artifactory NPM Maven Plugin")
                 description.set("Maven plugin that uploads NPM dependencies within a Maven project and includes them in the same build info")
-                url.set("https://github.com/octopusden/octopus-artifactory-npm-maven-plugin")
+                url.set("https://github.com/octopusden/octopus-artifactory-build-info-integration-plugins")
                 inceptionYear.set("2025")
 
                 licenses {
@@ -101,9 +101,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection.set("scm:git:https://github.com/octopusden/octopus-artifactory-npm-maven-plugin.git")
-                    developerConnection.set("scm:git:git@github.com:octopusden/octopus-artifactory-npm-maven-plugin.git")
-                    url.set("https://github.com/octopusden/octopus-artifactory-npm-maven-plugin")
+                    connection.set("scm:git:https://github.com/octopusden/octopus-artifactory-build-info-integration-plugins.git")
+                    developerConnection.set("scm:git:git@github.com:octopusden/octopus-artifactory-build-info-integration-plugins.git")
+                    url.set("https://github.com/octopusden/octopus-artifactory-build-info-integration-plugins")
                 }
                 developers {
                     developer {

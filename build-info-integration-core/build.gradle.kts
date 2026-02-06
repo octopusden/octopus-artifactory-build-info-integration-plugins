@@ -10,7 +10,7 @@ publishing {
             pom {
                 name.set(project.name)
                 description.set("Octopus module: ${project.name}")
-                url.set("https://github.com/octopusden/octopus-artifactory-npm-maven-plugin.git")
+                url.set("https://github.com/octopusden/octopus-artifactory-build-info-integration-plugins.git")
                 licenses {
                     license {
                         name.set("The Apache License, Version 2.0")
@@ -18,8 +18,8 @@ publishing {
                     }
                 }
                 scm {
-                    url.set("https://github.com/octopusden/octopus-artifactory-npm-maven-plugin.git")
-                    connection.set("scm:git://github.com/octopusden/octopus-artifactory-npm-maven-plugin.git")
+                    url.set("https://github.com/octopusden/octopus-artifactory-build-info-integration-plugins.git")
+                    connection.set("scm:git://github.com/octopusden/octopus-artifactory-build-info-integration-plugins.git")
                 }
                 developers {
                     developer {

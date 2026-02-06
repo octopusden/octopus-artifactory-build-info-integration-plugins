@@ -34,7 +34,7 @@ publishing {
             pom {
                 name.set("Artifactory NPM Gradle Plugin")
                 description.set("Gradle plugin that uploads NPM dependencies and includes them in Artifactory build info")
-                url.set("https://github.com/octopusden/octopus-artifactory-npm-maven-plugin")
+                url.set("https://github.com/octopusden/octopus-artifactory-build-info-integration-plugins")
                 inceptionYear.set("2025")
 
                 licenses {
@@ -45,9 +45,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection.set("scm:git:https://github.com/octopusden/octopus-artifactory-npm-maven-plugin.git")
-                    developerConnection.set("scm:git:git@github.com:octopusden/octopus-artifactory-npm-maven-plugin.git")
-                    url.set("https://github.com/octopusden/octopus-artifactory-npm-maven-plugin")
+                    connection.set("scm:git:https://github.com/octopusden/octopus-artifactory-build-info-integration-plugins.git")
+                    developerConnection.set("scm:git:git@github.com:octopusden/octopus-artifactory-build-info-integration-plugins.git")
+                    url.set("https://github.com/octopusden/octopus-artifactory-build-info-integration-plugins")
                 }
                 developers {
                     developer {

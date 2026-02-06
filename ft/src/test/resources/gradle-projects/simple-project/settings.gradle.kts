@@ -1,6 +1,6 @@
 pluginManagement {
     plugins {
-        id("org.octopusden.octopus.artifactory-npm-gradle-plugin") version settings.extra["octopus-artifactory-npm-gradle-plugin.version"] as String
+        id("org.octopusden.octopus.artifactory-npm-gradle-plugin") version "668130881-SNAPSHOT"
     }
 }
 
