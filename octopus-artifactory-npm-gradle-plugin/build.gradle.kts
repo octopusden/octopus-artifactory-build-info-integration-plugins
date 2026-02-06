@@ -30,7 +30,7 @@ gradlePlugin {
 
 publishing {
     publications {
-        create<MavenPublication>("pluginMaven") {
+        withType<MavenPublication> {
             pom {
                 name.set("Artifactory NPM Gradle Plugin")
                 description.set("Gradle plugin that uploads NPM dependencies and includes them in Artifactory build info")
@@ -65,5 +65,5 @@ signing {
     val signingKey: String? by project
     val signingPassword: String? by project
     useInMemoryPgpKeys(signingKey, signingPassword)
-    sign(publishing.publications["pluginMaven"])
+    sign(publishing.publications)
 }
