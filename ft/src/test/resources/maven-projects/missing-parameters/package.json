@@ -1,0 +1,11 @@
+{
+  "name": "test-artifactory-npm-plugins",
+  "version": "1.0.0",
+  "description": "Test Artifactory",
+  "private": true,
+  "dependencies": {
+    "jquery": "3.7.1",
+    "uuid": "11.1.0",
+    "zone.js": "0.15.0"
+  }
+}

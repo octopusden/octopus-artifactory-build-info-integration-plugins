@@ -1,0 +1,93 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.net.InetAddress
+import java.time.Duration
+import java.util.zip.CRC32
+
+plugins {
+    kotlin("jvm")
+    idea
+    signing
+    id("io.github.gradle-nexus.publish-plugin")
+    id("com.jfrog.artifactory")
+}
+
+val defaultVersion = run {
+    val host = runCatching { InetAddress.getLocalHost().hostName }.getOrNull() ?: "local"
+    "${CRC32().apply { update(host.toByteArray()) }.value}-SNAPSHOT"
+}
+
+allprojects {
+    group = "org.octopusden.octopus"
+    if (version == "unspecified") {
+        version = defaultVersion
+    }
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
+            username.set(System.getenv("MAVEN_USERNAME"))
+            password.set(System.getenv("MAVEN_PASSWORD"))
+        }
+    }
+    transitionCheckOptions {
+        maxRetries.set(60)
+        delayBetween.set(Duration.ofSeconds(30))
+    }
+}
+
+subprojects {
+    apply(plugin = "org.jetbrains.kotlin.jvm")
+    apply(plugin = "maven-publish")
+    apply(plugin = "signing")
+    apply(plugin = "idea")
+    apply(plugin = "com.jfrog.artifactory")
+
+    artifactory {
+        publish {
+            val baseUrl = System.getenv("ARTIFACTORY_URL") ?: project.findProperty("artifactoryUrl") as String?
+            if (!baseUrl.isNullOrBlank()) {
+                contextUrl = "$baseUrl/artifactory"
+            }
+            repository {
+                repoKey = "rnd-maven-dev-local"
+                val repoUser = System.getenv("ARTIFACTORY_DEPLOYER_USERNAME") ?: project.findProperty("NEXUS_USER") as String?
+                val repoPassword = System.getenv("ARTIFACTORY_DEPLOYER_PASSWORD") ?: project.findProperty("NEXUS_PASSWORD") as String?
+                if (!repoUser.isNullOrBlank()) username = repoUser
+                if (!repoPassword.isNullOrBlank()) password = repoPassword
+            }
+            defaults {
+                publications("ALL_PUBLICATIONS")
+            }
+        }
+    }
+
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(8))
+        }
+        withJavadocJar()
+        withSourcesJar()
+    }
+
+    kotlin {
+        jvmToolchain(8)
+    }
+
+    idea.module {
+        isDownloadJavadoc = true
+        isDownloadSources = true
+    }
+
+    ext {
+        val signingRequired = listOf("ORG_GRADLE_PROJECT_signingKey", "ORG_GRADLE_PROJECT_signingPassword")
+            .all { System.getenv().containsKey(it) && !System.getenv(it).isNullOrBlank() }
+        set("signingRequired", signingRequired)
+    }
+}
