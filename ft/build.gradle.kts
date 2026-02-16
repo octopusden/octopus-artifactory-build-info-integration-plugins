@@ -1,3 +1,5 @@
+import org.octopusden.octopus.task.ConfigureMockServer
+
 plugins {
     id("org.octopusden.octopus.oc-template")
 }
@@ -46,6 +48,11 @@ fun String.getPort() = when (this) {
 }
 fun getOkdInternalHost(serviceName: String) = "${ocTemplate.getPod(serviceName)}-service:${serviceName.getPort()}"
 
+val commonOkdParameters = mapOf(
+    "ACTIVE_DEADLINE_SECONDS" to "okdActiveDeadlineSeconds".getExt(),
+    "DOCKER_REGISTRY" to "dockerRegistry".getExt()
+)
+
 ocTemplate {
     enabled.set("testPlatform".getExt() == "okd")
 
@@ -59,24 +66,40 @@ ocTemplate {
         webConsoleUrl.set(it)
     }
 
-    service("postgres") {
-        templateFile.set(rootProject.layout.projectDirectory.file("okd/postgres.yaml"))
-        parameters.set(mapOf(
-            "ACTIVE_DEADLINE_SECONDS" to "okdActiveDeadlineSeconds".getExt(),
-            "DOCKER_REGISTRY" to "dockerRegistry".getExt()
+//    service("postgres") {
+//        templateFile.set(rootProject.layout.projectDirectory.file("okd/postgres.yaml"))
+//        parameters.set(commonOkdParameters)
+//    }
+//
+//    service("artifactory") {
+//        templateFile.set(rootProject.layout.projectDirectory.file("okd/artifactory.yaml"))
+//        parameters.set(mapOf(
+//            "ACTIVE_DEADLINE_SECONDS" to "okdActiveDeadlineSeconds".getExt(),
+//            "POSTGRES_HOST" to getOkdInternalHost("postgres")
+//        ))
+//        dependsOn.set(listOf("postgres"))
+//    }
+
+    service("mockserver") {
+        templateFile.set(rootProject.layout.projectDirectory.file("okd/mockserver.yaml"))
+        parameters.set(commonOkdParameters + mapOf(
+            "MOCK_SERVER_VERSION" to properties["mockserver.version"] as String
         ))
     }
 
-    service("artifactory") {
-        templateFile.set(rootProject.layout.projectDirectory.file("okd/artifactory.yaml"))
-        parameters.set(mapOf(
-            "ACTIVE_DEADLINE_SECONDS" to "okdActiveDeadlineSeconds".getExt(),
-            "POSTGRES_HOST" to getOkdInternalHost("postgres")
+    service("components-registry") {
+        templateFile.set(rootProject.layout.projectDirectory.file("okd/components-registry.yaml"))
+        val componentsRegistryWorkDir = layout.projectDirectory.dir("resources/components-registry").asFile.absolutePath
+        parameters.set(commonOkdParameters + mapOf(
+            "COMPONENTS_REGISTRY_SERVICE_VERSION" to properties["octopus-components-registry-service.version"] as String,
+            "AGGREGATOR_GROOVY_CONTENT" to file("$componentsRegistryWorkDir/src/Aggregator.groovy").readText(),
+            "DEFAULTS_GROOVY_CONTENT" to file("$componentsRegistryWorkDir/src/Defaults.groovy").readText(),
+            "TEST_COMPONENTS_GROOVY_CONTENT" to file("$componentsRegistryWorkDir/src/TestComponents.groovy").readText(),
+            "APPLICATION_DEV_CONTENT" to layout.projectDirectory.dir("$componentsRegistryWorkDir/components-registry-service.yaml").asFile.readText()
         ))
-        dependsOn.set(listOf("postgres"))
     }
 
-    isRequiredBy(tasks.test)
+//    isRequiredBy(tasks.test)
 }
 
 dependencies {
@@ -87,17 +110,28 @@ dependencies {
     testApi("com.platformlib:platformlib-process-local:${property("platformlib.version")}")
 }
 
+val configureMockServer by tasks.registering(ConfigureMockServer::class) {
+//    host.set(ocTemplate.getOkdHost("mockserver"))
+    host.set("localhost")
+    port.set(1080)
+    dependsOn("ocCreate")
+}
+
+
 tasks.test {
     useJUnitPlatform()
 
     dependsOn(":octopus-artifactory-npm-maven-plugin:publishToMavenLocal")
     dependsOn(":octopus-artifactory-npm-gradle-plugin:publishToMavenLocal")
+    dependsOn(configureMockServer)
 
     doFirst {
-        if ("testPlatform".getExt().isBlank()) {
-            throw IllegalArgumentException("-Ptest.platform or env variable TEST_PLATFORM must be specified to run functional tests")
-        }
-        systemProperty("artifactoryTestHost", ocTemplate.getOkdHost("artifactory"))
+//        if ("testPlatform".getExt().isBlank()) {
+//            throw IllegalArgumentException("-Ptest.platform or env variable TEST_PLATFORM must be specified to run functional tests")
+//        }
+//        systemProperty("artifactoryTestHost", ocTemplate.getOkdHost("artifactory"))
+        systemProperty("artifactoryTestHost", "localhost:18081")
         systemProperty("octopusArtifactoryIntegrationPluginVersion", project.version.toString())
     }
 }
+

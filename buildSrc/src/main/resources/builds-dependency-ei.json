@@ -1,0 +1,33 @@
+{
+  "component": "dependency-ei",
+  "version": "1.0.0",
+  "status": "BUILD",
+  "parents": [
+    {
+      "component": "main-component",
+      "version": "1.0.0",
+      "status": "BUILD",
+      "hotfix": false
+    }
+  ],
+  "dependencies": [
+    {
+      "component": "dependency-ee",
+      "version": "1.0.0",
+      "status": "BUILD",
+      "hotfix": false
+    }
+  ],
+  "commits": [
+    {
+      "repository": "ssh://git@git.domain.corp/ee/dependency-ei.git",
+      "sha": "9c0f29d16ff95ecc11cd0d9d77ce414f9f3d15ec",
+      "branch": "refs/heads/master",
+      "inReleaseBranch": true
+    }
+  ],
+  "statusHistory": {
+    "BUILD": "2025-11-15T22:13:57.000+00:00"
+  },
+  "hotfix": false
+}

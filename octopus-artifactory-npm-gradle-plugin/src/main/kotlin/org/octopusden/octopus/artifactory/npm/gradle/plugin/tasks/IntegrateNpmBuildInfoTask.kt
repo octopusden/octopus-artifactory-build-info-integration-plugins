@@ -39,8 +39,15 @@ abstract class IntegrateNpmBuildInfoTask : BaseNpmBuildInfoTask() {
                 )
             }
 
-            integrationService.integrateNpmBuildInfo(buildInfoConfiguration, resolveDependencies(), !packageJsonAvailable, skipWaitForXrayScan.get())
+            val dependencies = resolveDependencies()
+            if (!packageJsonAvailable && dependencies.isEmpty()) {
+                logger.lifecycle("No package.json found and no dependencies resolved, skipping NPM build info integration")
+                return
+            }
+
+            integrationService.integrateNpmBuildInfo(buildInfoConfiguration, dependencies, !packageJsonAvailable, skipWaitForXrayScan.get())
             logger.lifecycle("NPM build info integrated successfully")
+
         } catch (e: Exception) {
             logger.error("Failed to integrate NPM build info: ${e.message}", e)
             throw GradleException("Failed to integrate NPM build info", e)

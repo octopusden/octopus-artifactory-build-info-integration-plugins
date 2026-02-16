@@ -111,7 +111,7 @@ class GradleFunctionalTest: BaseFunctionalTest() {
             )
         }
 
-        assertFailedOperations(instance, "Skipping NPM build info integration: package.json not found", buildName, buildNumber)
+        assertFailedOperations(instance, "No package.json found and no dependencies resolved, skipping NPM build info integration", buildName, buildNumber)
     }
 
     override fun assertFailedOperations(instance: ProcessInstance, errorMessage: String, buildName: String, buildNumber: String) {
