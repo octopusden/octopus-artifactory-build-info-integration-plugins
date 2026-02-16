@@ -25,7 +25,7 @@ tasks.register<Exec>("generatePluginDescriptor") {
     val mavenPluginToolsVersion = project.property("maven-plugin-tools.version")
 
     commandLine(
-        "/Users/aksetiyawan/MacOS/MAVEN/LATEST/bin/mvn",
+        "mvn",
         "-B",
         "-f", pomFile.canonicalPath,
         "-e",
