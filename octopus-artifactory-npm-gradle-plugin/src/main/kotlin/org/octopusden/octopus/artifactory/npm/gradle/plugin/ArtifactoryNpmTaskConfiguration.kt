@@ -3,7 +3,6 @@ package org.octopusden.octopus.artifactory.npm.gradle.plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
 import org.octopusden.octopus.artifactory.npm.gradle.plugin.tasks.IntegrateNpmBuildInfoTask
-import java.io.File
 
 class ArtifactoryNpmTaskConfiguration(
     private val project: Project,
@@ -24,6 +23,9 @@ class ArtifactoryNpmTaskConfiguration(
             task.buildNumber.set(settings.buildNumber)
             task.npmBuildNameSuffix.set(settings.npmBuildNameSuffix)
             task.packageJsonPath.set(settings.packageJsonPath)
+            task.dependenciesFilePath.set(settings.dependenciesFilePath)
+            task.componentRegistryServiceUrl.set(settings.componentRegistryServiceUrl)
+            task.releaseManagementServiceUrl.set(settings.releaseManagementServiceUrl)
             task.cleanupNpmBuildInfo.set(settings.cleanupNpmBuildInfo)
             task.skipWaitForXrayScan.set(settings.skipWaitForXrayScan)
         }
@@ -54,11 +56,6 @@ class ArtifactoryNpmTaskConfiguration(
 
             project.logger.lifecycle("Build finished successfully, integrating NPM build info...")
 
-            if (!isPackageJsonAvailable()) {
-                project.logger.info("Skipping NPM build info integration: package.json not found")
-                return@buildFinished
-            }
-
             try {
                 integrationTask?.get()?.integrateNpmBuildInfo()
             } catch (e: Exception) {
@@ -66,16 +63,5 @@ class ArtifactoryNpmTaskConfiguration(
                 project.logger.warn("NPM build info integration failed, but build will continue")
             }
         }
-    }
-
-    private fun isPackageJsonAvailable(): Boolean {
-        val path = settings.packageJsonPath.get()
-        val packageJsonDir = if (path.isEmpty()) {
-            project.projectDir
-        } else {
-            File(project.projectDir, path)
-        }
-        val packageJsonFile = File(packageJsonDir, "package.json")
-        return packageJsonFile.exists() && packageJsonFile.isFile
     }
 }

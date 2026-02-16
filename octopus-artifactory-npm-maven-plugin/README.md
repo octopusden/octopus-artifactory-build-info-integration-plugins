@@ -35,6 +35,10 @@ Required properties:
 - `artifactory.build.name` - Maven build info name to append
 - `artifactory.build.version` - Maven build info version to append
 
+## Planned Features
+
+> ⚠️ **Note:** The Gradle plugin (`octopus-artifactory-npm-gradle-plugin`) already supports collecting NPM modules from the dependency. This feature is planned for the Maven plugin but not yet implemented. See [TECH_DEBT.md](../docs/TECH_DEBT.md) for details.
+
 ## Development Notes
 This plugin uses a `MavenExecutionListener` and runs on the `sessionEnded` event.
 This ensures integration happens after the Artifactory Maven plugin publishes its build info (which occurs at the very end of the build lifecycle).

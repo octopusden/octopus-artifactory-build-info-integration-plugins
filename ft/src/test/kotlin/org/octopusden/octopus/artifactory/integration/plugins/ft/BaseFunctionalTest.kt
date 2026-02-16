@@ -20,6 +20,7 @@ abstract class BaseFunctionalTest {
 
     abstract val defaultTasks: List<String>
     abstract val artifactoryProperties: List<String>
+    abstract val serviceProperties: List<String>
 
     protected val artifactoryClient = ArtifactoryClassicClient(object : ClientParametersProvider {
         override fun getApiUrl() = artifactoryUrl

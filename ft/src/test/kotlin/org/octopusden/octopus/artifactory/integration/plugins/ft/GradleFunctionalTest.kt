@@ -16,6 +16,11 @@ class GradleFunctionalTest: BaseFunctionalTest() {
         "-Dartifactory.password=$ARTIFACTORY_PASSWORD"
     )
 
+    override val serviceProperties = listOf(
+        "-Pcomponent-registry-service-url=test-url",
+        "-Prelease-management-service-url=test-url",
+    )
+
     @Test
     fun testSimpleProject() {
         val buildName = "simple-project-gradle"
@@ -26,7 +31,7 @@ class GradleFunctionalTest: BaseFunctionalTest() {
         val instance = gradleProcessInstance {
             testProjectName = "gradle-projects/simple-project"
             tasks = defaultTasks
-            additionalArguments = artifactoryProperties + listOf(
+            additionalArguments = artifactoryProperties + serviceProperties + listOf(
                 "-Pversion=$buildNumber",
                 "-PbuildInfo.build.name=$buildName",
                 "-PbuildInfo.build.number=$buildNumber"
@@ -60,7 +65,7 @@ class GradleFunctionalTest: BaseFunctionalTest() {
         val instance = gradleProcessInstance {
             testProjectName = "gradle-projects/simple-project"
             tasks = defaultTasks
-            additionalArguments = artifactoryProperties + listOf(
+            additionalArguments = artifactoryProperties + serviceProperties + listOf(
                 "-Pversion=$buildNumber"
             )
         }
@@ -78,7 +83,7 @@ class GradleFunctionalTest: BaseFunctionalTest() {
         val instance = gradleProcessInstance {
             testProjectName = "gradle-projects/simple-project"
             tasks = defaultTasks
-            additionalArguments = listOf(
+            additionalArguments = serviceProperties + listOf(
                 "-Pversion=$buildNumber",
                 "-PbuildInfo.build.name=$buildName",
                 "-PbuildInfo.build.number=$buildNumber",
@@ -99,7 +104,7 @@ class GradleFunctionalTest: BaseFunctionalTest() {
         val instance = gradleProcessInstance {
             testProjectName = "gradle-projects/missing-package-json"
             tasks = defaultTasks
-            additionalArguments = artifactoryProperties + listOf(
+            additionalArguments = artifactoryProperties + serviceProperties + listOf(
                 "-Pversion=$buildNumber",
                 "-PbuildInfo.build.name=$buildName",
                 "-PbuildInfo.build.number=$buildNumber",

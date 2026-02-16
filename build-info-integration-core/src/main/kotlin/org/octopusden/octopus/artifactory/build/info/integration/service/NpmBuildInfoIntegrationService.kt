@@ -2,8 +2,9 @@ package org.octopusden.octopus.artifactory.build.info.integration.service
 
 import org.octopusden.octopus.artifactory.build.info.integration.configuration.ArtifactoryConfiguration
 import org.octopusden.octopus.artifactory.build.info.integration.configuration.BuildInfoConfiguration
+import org.octopusden.octopus.artifactory.build.info.integration.dto.DependencyVersion
 
 interface NpmBuildInfoIntegrationService {
     fun generateNpmBuildInfo(packageJsonPath: String, buildInfoConfig: BuildInfoConfiguration, artifactoryConfig: ArtifactoryConfiguration)
-    fun integrateNpmBuildInfo(buildInfoConfig: BuildInfoConfiguration, skipWaitForXrayScan: Boolean)
+    fun integrateNpmBuildInfo(buildInfoConfig: BuildInfoConfiguration, directDependencies: List<DependencyVersion>, skipDirectNpmDependenciesGeneration: Boolean, skipWaitForXrayScan: Boolean)
 }

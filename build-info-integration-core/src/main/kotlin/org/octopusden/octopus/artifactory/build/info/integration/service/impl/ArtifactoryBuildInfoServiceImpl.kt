@@ -1,10 +1,10 @@
 package org.octopusden.octopus.artifactory.build.info.integration.service.impl
 
+import org.octopusden.octopus.artifactory.build.info.integration.dto.DependencyBuildInfo
 import org.octopusden.octopus.artifactory.build.info.integration.exception.ArtifactoryException
 import org.octopusden.octopus.artifactory.build.info.integration.service.ArtifactoryBuildInfoService
 import org.octopusden.octopus.infrastructure.artifactory.client.ArtifactoryClient
 import org.octopusden.octopus.infrastructure.artifactory.client.dto.Agent
-import org.octopusden.octopus.infrastructure.artifactory.client.dto.BuildAgent
 import org.octopusden.octopus.infrastructure.artifactory.client.dto.BuildInfo
 import org.octopusden.octopus.infrastructure.artifactory.client.dto.DeleteBuildRequest
 import org.octopusden.octopus.infrastructure.artifactory.client.exception.ArtifactoryClientException
@@ -27,11 +27,34 @@ class ArtifactoryBuildInfoServiceImpl(
             throw ArtifactoryException("Failed to retrieve build info from Artifactory", e)
         }
 
-    override fun mergeBuildInfo(mavenBuildInfo: BuildInfo, npmBuildInfo: BuildInfo): BuildInfo {
-        logger.info("Merging NPM build info (${npmBuildInfo.name}:${npmBuildInfo.number}) into Maven build info (${mavenBuildInfo.name}:${mavenBuildInfo.number})")
+    override fun getNpmDependenciesBuildInfo(dependencies: List<DependencyBuildInfo>): List<BuildInfo> =
+        dependencies.mapNotNull { buildInfo ->
+            logger.info("Retrieving build info for dependency build ${buildInfo.buildName}:${buildInfo.buildNumber}")
+
+            val dependencyBuildInfo = artifactoryClient.getBuildInfo(buildInfo.buildName, buildInfo.buildNumber).buildInfo
+
+            val npmModules = dependencyBuildInfo.modules
+                ?.filter { it.type == "npm" }
+                ?.takeIf { it.isNotEmpty() }
+
+            npmModules?.let {
+                dependencyBuildInfo.copy(
+                    modules = it
+                )
+            }
+        }
+
+    override fun mergeBuildInfo(mavenBuildInfo: BuildInfo, npmBuildInfo: BuildInfo?, npmDependenciesBuildInfo: List<BuildInfo>): BuildInfo {
+        if (npmBuildInfo != null) {
+            logger.info("Merging NPM build info (${npmBuildInfo.name}:${npmBuildInfo.number}) into Maven build info (${mavenBuildInfo.name}:${mavenBuildInfo.number})")
+        }
 
         val mergedModules = (mavenBuildInfo.modules?.toList() ?: emptyList()).toMutableList()
-        mergedModules += npmBuildInfo.modules?.map { it.copy(artifacts = emptyList()) } ?: emptyList()
+        mergedModules += npmBuildInfo?.modules?.map { it.copy(artifacts = emptyList()) } ?: emptyList()
+        npmDependenciesBuildInfo.forEach { dependencyBuildInfo ->
+            logger.info("Merging NPM dependencies build info (${dependencyBuildInfo.name}:${dependencyBuildInfo.number}) into Maven build info (${mavenBuildInfo.name}:${mavenBuildInfo.number})")
+            mergedModules += dependencyBuildInfo.modules?.map { it.copy(artifacts = emptyList()) } ?: emptyList()
+        }
 
         return BuildInfo(
             mavenBuildInfo.name,
