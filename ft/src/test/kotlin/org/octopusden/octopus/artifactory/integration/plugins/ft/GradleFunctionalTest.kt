@@ -216,8 +216,8 @@ class GradleFunctionalTest: BaseFunctionalTest() {
         val modules = buildInfo.modules!!.toList()
         assertEquals(3, modules.size)
         assertEquals("gradle", modules[0].type)
-        assertModule(modules[1], eeModules[1])
-        assertModule(modules[2], eiModules[2])
+        assertModule(modules[1], eiModules[2])
+        assertModule(modules[2], eeModules[1])
     }
 
     override fun assertFailedOperations(instance: ProcessInstance, errorMessage: String, buildName: String, buildNumber: String) {

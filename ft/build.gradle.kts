@@ -66,19 +66,19 @@ ocTemplate {
         webConsoleUrl.set(it)
     }
 
-//    service("postgres") {
-//        templateFile.set(rootProject.layout.projectDirectory.file("okd/postgres.yaml"))
-//        parameters.set(commonOkdParameters)
-//    }
-//
-//    service("artifactory") {
-//        templateFile.set(rootProject.layout.projectDirectory.file("okd/artifactory.yaml"))
-//        parameters.set(mapOf(
-//            "ACTIVE_DEADLINE_SECONDS" to "okdActiveDeadlineSeconds".getExt(),
-//            "POSTGRES_HOST" to getOkdInternalHost("postgres")
-//        ))
-//        dependsOn.set(listOf("postgres"))
-//    }
+    service("postgres") {
+        templateFile.set(rootProject.layout.projectDirectory.file("okd/postgres.yaml"))
+        parameters.set(commonOkdParameters)
+    }
+
+    service("artifactory") {
+        templateFile.set(rootProject.layout.projectDirectory.file("okd/artifactory.yaml"))
+        parameters.set(mapOf(
+            "ACTIVE_DEADLINE_SECONDS" to "okdActiveDeadlineSeconds".getExt(),
+            "POSTGRES_HOST" to getOkdInternalHost("postgres")
+        ))
+        dependsOn.set(listOf("postgres"))
+    }
 
     service("mockserver") {
         templateFile.set(rootProject.layout.projectDirectory.file("okd/mockserver.yaml"))
@@ -87,9 +87,9 @@ ocTemplate {
         ))
     }
 
-    service("components-registry") {
+    service("comp-reg") {
         templateFile.set(rootProject.layout.projectDirectory.file("okd/components-registry.yaml"))
-        val componentsRegistryWorkDir = layout.projectDirectory.dir("resources/components-registry").asFile.absolutePath
+        val componentsRegistryWorkDir = layout.projectDirectory.dir("src/test/resources/components-registry").asFile.absolutePath
         parameters.set(commonOkdParameters + mapOf(
             "COMPONENTS_REGISTRY_SERVICE_VERSION" to properties["octopus-components-registry-service.version"] as String,
             "AGGREGATOR_GROOVY_CONTENT" to file("$componentsRegistryWorkDir/src/Aggregator.groovy").readText(),
@@ -99,7 +99,7 @@ ocTemplate {
         ))
     }
 
-//    isRequiredBy(tasks.test)
+    isRequiredBy(tasks.test)
 }
 
 dependencies {
@@ -111,9 +111,8 @@ dependencies {
 }
 
 val configureMockServer by tasks.registering(ConfigureMockServer::class) {
-//    host.set(ocTemplate.getOkdHost("mockserver"))
-    host.set("localhost")
-    port.set(1080)
+    host.set(ocTemplate.getOkdHost("mockserver"))
+    port.set(80)
     dependsOn("ocCreate")
 }
 
@@ -126,11 +125,12 @@ tasks.test {
     dependsOn(configureMockServer)
 
     doFirst {
-//        if ("testPlatform".getExt().isBlank()) {
-//            throw IllegalArgumentException("-Ptest.platform or env variable TEST_PLATFORM must be specified to run functional tests")
-//        }
-//        systemProperty("artifactoryTestHost", ocTemplate.getOkdHost("artifactory"))
-        systemProperty("artifactoryTestHost", "localhost:18081")
+        if ("testPlatform".getExt().isBlank()) {
+            throw IllegalArgumentException("-Ptest.platform or env variable TEST_PLATFORM must be specified to run functional tests")
+        }
+        systemProperty("artifactoryTestHost", ocTemplate.getOkdHost("artifactory"))
+        systemProperty("componentsRegistryServiceUrl", "http://${ocTemplate.getOkdHost("comp-reg")}")
+        systemProperty("releaseManagementServiceUrl", "http://${ocTemplate.getOkdHost("mockserver")}")
         systemProperty("octopusArtifactoryIntegrationPluginVersion", project.version.toString())
     }
 }
