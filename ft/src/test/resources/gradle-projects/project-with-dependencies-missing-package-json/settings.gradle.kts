@@ -4,4 +4,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = "simple-project-gradle"
+rootProject.name = "project-with-dependencies-missing-package-json"

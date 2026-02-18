@@ -25,7 +25,7 @@ abstract class ConfigureMockServer : DefaultTask() {
         mockServerClient.reset()
         mockServerClient.`when`(
             HttpRequest.request().withMethod("GET")
-                .withPath("/rest/release-engineering/3/component/{component-name}/version/{version}/build")
+                .withPath("/rest/api/1/builds/component/{component-name}/version/{version}")
                 .withPathParameter("component-name")
                 .withPathParameter("version")
         ).respond { request ->

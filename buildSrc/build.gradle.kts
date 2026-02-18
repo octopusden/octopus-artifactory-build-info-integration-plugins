@@ -1,3 +1,7 @@
+plugins {
+    `kotlin-dsl`
+}
+
 dependencies {
     implementation(gradleApi())
     implementation("org.mock-server:mockserver-client-java:5.11.1")

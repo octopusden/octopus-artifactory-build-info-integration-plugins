@@ -1,4 +1,4 @@
-dependency-ee {
+"dependency-ee" {
     system = "CLASSIC"
     componentDisplayName = "Dependency EE"
     componentOwner = "Dependency Owner"
@@ -14,7 +14,7 @@ dependency-ee {
     }
 }
 
-dependency-ei {
+"dependency-ei" {
     system = "CLASSIC"
     componentDisplayName = "Dependency EI"
     componentOwner = "Dependency Owner"
@@ -30,7 +30,7 @@ dependency-ei {
     }
 }
 
-dependency-ie {
+"dependency-ie" {
     system = "CLASSIC"
     componentDisplayName = "Dependency IE"
     componentOwner = "Dependency Owner"
@@ -46,7 +46,7 @@ dependency-ie {
     }
 }
 
-main-component {
+"main-component" {
     system = "CLASSIC"
     componentDisplayName = "Dependency IE"
     componentOwner = "Dependency Owner"

@@ -22,15 +22,20 @@ publishing {
 artifactory {
     setContextUrl(System.getProperty("artifactory.url") + "/artifactory")
     publish {
+        val buildName = project.findProperty("buildInfo.build.name") as String? ?: rootProject.name
+        val buildNumber = project.findProperty("buildInfo.build.number") as String? ?: version.toString()
+
         buildInfo {
-            buildName = System.getProperty("buildInfo.build.name") ?: rootProject.name
-            buildNumber = System.getProperty("buildInfo.build.number") ?: version.toString()
+            this.buildName = buildName
+            this.buildNumber = buildNumber
         }
+
         repository {
             repoKey = System.getProperty("artifactory.repoKey") ?: "example-repo-local"
             username = System.getProperty("artifactory.username") ?: "admin"
             password = System.getProperty("artifactory.password") ?: "password"
         }
+
         defaults {
             publications("maven")
             setPublishArtifacts(true)

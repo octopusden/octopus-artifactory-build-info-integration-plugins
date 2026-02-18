@@ -8,10 +8,13 @@ import org.octopusden.octopus.components.registry.client.impl.ClassicComponentsR
 import org.octopusden.octopus.components.registry.client.impl.ClassicComponentsRegistryServiceClientUrlProvider
 import org.octopusden.octopus.releasemanagementservice.client.impl.ClassicReleaseManagementServiceClient
 import org.octopusden.octopus.releasemanagementservice.client.impl.ReleaseManagementServiceClientParametersProvider
+import org.slf4j.LoggerFactory
 
 class DependenciesBuildInfoResolverImpl(
     private val serviceConfiguration: ServiceConfiguration
 ): DependenciesBuildInfoResolver {
+
+    private val logger = LoggerFactory.getLogger(JFrogNpmCliServiceImpl::class.java)
 
     private val componentsRegistryServiceClient by lazy {
         ClassicComponentsRegistryServiceClient(
@@ -33,9 +36,16 @@ class DependenciesBuildInfoResolverImpl(
     }
 
     override fun getAllDependenciesBuildInfo(directDependencies: List<DependencyVersion>): List<DependencyBuildInfo> {
+        if (directDependencies.isEmpty()) {
+            logger.info("No direct dependencies provided, returning empty build info list")
+            return emptyList()
+        }
+
         val result = mutableListOf<DependencyBuildInfo>()
         val visited = mutableSetOf<String>() // component:version
         val queue = ArrayDeque<Pair<String, String>>()
+
+        logger.info("Found ${directDependencies.size} direct-dependencies versions: ${directDependencies.joinToString(", ") { "${it.name}:${it.version}" }}")
 
         directDependencies.forEach { queue.add(it.name to it.version) }
 
@@ -60,8 +70,7 @@ class DependenciesBuildInfoResolverImpl(
     }
 
     private fun getComponentBuildName(component: String): String {
-        val componentDto = componentsRegistryServiceClient.getById(component)
-        val distribution = componentDto.distribution
+        val distribution = componentsRegistryServiceClient.getById(component).distribution
 
         val explicitFlag = if (distribution?.explicit == true) "e" else "i"
         val externalFlag = if (distribution?.external == true) "e" else "i"

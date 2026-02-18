@@ -50,8 +50,8 @@ class NpmBuildInfoIntegrationServiceImpl(
             logger.debug("Skipping retrieval of direct NPM build info as per configuration")
             null
         }
-        val npmDependenciesBuildInfo = buildInfoService.getNpmDependenciesBuildInfo(dependenciesBuildInfoResolver.getAllDependenciesBuildInfo(directDependencies))
-        val mergedBuildInfo = buildInfoService.mergeBuildInfo(mavenBuildInfo, npmBuildInfo, npmDependenciesBuildInfo)
+        val npmDependenciesModules = buildInfoService.getNpmDependenciesModules(dependenciesBuildInfoResolver.getAllDependenciesBuildInfo(directDependencies))
+        val mergedBuildInfo = buildInfoService.mergeBuildInfo(mavenBuildInfo, npmBuildInfo, npmDependenciesModules)
 
         if (skipWaitForXrayScan) {
             logger.debug("Skipping wait for Xray indexing before uploading merged build info as per configuration")

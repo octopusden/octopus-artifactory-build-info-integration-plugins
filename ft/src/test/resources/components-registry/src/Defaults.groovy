@@ -25,8 +25,5 @@ Defaults {
     distribution {
         explicit = false
         external = true
-        securityGroups {
-            read = "Production Security"
-        }
     }
 }
