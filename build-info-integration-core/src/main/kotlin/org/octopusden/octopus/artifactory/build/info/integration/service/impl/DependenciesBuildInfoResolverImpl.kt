@@ -14,7 +14,7 @@ class DependenciesBuildInfoResolverImpl(
     private val serviceConfiguration: ServiceConfiguration
 ): DependenciesBuildInfoResolver {
 
-    private val logger = LoggerFactory.getLogger(JFrogNpmCliServiceImpl::class.java)
+    private val logger = LoggerFactory.getLogger(DependenciesBuildInfoResolverImpl::class.java)
 
     private val componentsRegistryServiceClient by lazy {
         ClassicComponentsRegistryServiceClient(
@@ -69,12 +69,13 @@ class DependenciesBuildInfoResolverImpl(
         return result
     }
 
-    private fun getComponentBuildName(component: String): String {
-        val distribution = componentsRegistryServiceClient.getById(component).distribution
+    private val buildNameCache = mutableMapOf<String, String>()
 
-        val explicitFlag = if (distribution?.explicit == true) "e" else "i"
-        val externalFlag = if (distribution?.external == true) "e" else "i"
-
-        return "${component}_${explicitFlag}${externalFlag}"
-    }
+    private fun getComponentBuildName(component: String): String =
+        buildNameCache.getOrPut(component) {
+            val distribution = componentsRegistryServiceClient.getById(component).distribution
+            val explicitFlag = if (distribution?.explicit == true) "e" else "i"
+            val externalFlag = if (distribution?.external == true) "e" else "i"
+            "${component}_${explicitFlag}${externalFlag}"
+        }
 }

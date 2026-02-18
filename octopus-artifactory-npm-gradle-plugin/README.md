@@ -13,7 +13,14 @@ If the project contains a package.json file (either in the project root or at a 
 For all cases, the plugin will:
 1. Read the dependencies.json file (specified on dependenciesFilePath setting or project property)
    - Contains a list of direct dependencies and their versions (name and version).
-   - If dependenciesFilePath is not specified or the file is not found, the plugin will skip resolving NPM build info from dependencies.
+   - If `dependenciesFilePath` is not specified or the file is not found, the plugin will skip resolving NPM build info from dependencies.
+   - Example of dependencies.json:
+      ```json
+      [
+         {"name": "dependency-ee", "version": "1.0.0"},
+         {"name": "dependency-ei", "version": "1.0.0"}
+      ]
+      ```
 2. Resolve all transitive dependencies using the Release Management Service.
 3. For each resolved dependency:
    - Retrieve its build info from Artifactory. 
