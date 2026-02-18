@@ -40,7 +40,7 @@ class ArtifactoryBuildInfoServiceImpl(
                 logger.warn("Build info for dependency build ${dependency.buildName}:${dependency.buildNumber} not found. Skipping: ${e.message}")
                 emptyList()
             } catch (e: ArtifactoryClientException) {
-                logger.warn("Error retrieving build info for dependency build ${dependency.buildName}:${dependency.buildNumber}. Skipping:", e.message)
+                logger.warn("Error retrieving build info for dependency build ${dependency.buildName}:${dependency.buildNumber}. Skipping: ${e.message}")
                 emptyList()
             }
         }.distinctBy { it.id }
