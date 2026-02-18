@@ -4,7 +4,7 @@
     componentOwner = "Dependency Owner"
     releaseManager = "Dependency Manager"
     groupId = "corp.domain"
-    vcsUrl = "ssh://git@git.domain.corp/ee/dependency-ee.git"
+    vcsUrl = "ssh://git@git.domain.corp/proj/dependency-ee.git"
     jira {
         projectKey = 'DEPS'
     }
@@ -20,7 +20,7 @@
     componentOwner = "Dependency Owner"
     releaseManager = "Dependency Manager"
     groupId = "corp.domain"
-    vcsUrl = "ssh://git@git.domain.corp/ee/dependency-ei.git"
+    vcsUrl = "ssh://git@git.domain.corp/proj/dependency-ei.git"
     jira {
         projectKey = 'DEPS'
     }
@@ -36,7 +36,7 @@
     componentOwner = "Dependency Owner"
     releaseManager = "Dependency Manager"
     groupId = "corp.domain"
-    vcsUrl = "ssh://git@git.domain.corp/ee/dependency-ie.git"
+    vcsUrl = "ssh://git@git.domain.corp/proj/dependency-ie.git"
     jira {
         projectKey = 'DEPS'
     }
@@ -48,11 +48,11 @@
 
 "main-component" {
     system = "CLASSIC"
-    componentDisplayName = "Dependency IE"
+    componentDisplayName = "Main Component"
     componentOwner = "Dependency Owner"
     releaseManager = "Dependency Manager"
     groupId = "corp.domain"
-    vcsUrl = "ssh://git@git.domain.corp/ee/dependency-ie.git"
+    vcsUrl = "ssh://git@git.domain.corp/proj/main-component.git"
     jira {
         projectKey = 'DEPS'
     }

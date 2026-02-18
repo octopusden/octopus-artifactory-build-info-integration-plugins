@@ -20,10 +20,10 @@ publishing {
 }
 
 artifactory {
-    setContextUrl(System.getProperty("artifactory.url") + "/artifactory")
+    setContextUrl((System.getProperty("artifactory.url") ?: error("artifactory.url system property is required")) + "/artifactory")
     publish {
-        val buildName = project.findProperty("buildInfo.build.name") as String? ?: rootProject.name
-        val buildNumber = project.findProperty("buildInfo.build.number") as String? ?: version.toString()
+        val buildName = project.findProperty("buildInfo.build.name")?.toString() ?: rootProject.name
+        val buildNumber = project.findProperty("buildInfo.build.number")?.toString() ?: version.toString()
 
         buildInfo {
             this.buildName = buildName

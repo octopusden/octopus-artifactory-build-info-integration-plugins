@@ -77,7 +77,7 @@ class ArtifactoryNpmMavenPluginMojo : AbstractMojo() {
     private var skipWaitForXrayScan: Boolean = false
 
     @Parameter(property = "registry.url", defaultValue = "")
-    private var componentRegistryServiceUrl: String = ""
+    private var componentsRegistryServiceUrl: String = ""
 
     @Parameter(property = "release.management.url", defaultValue = "")
     private var releaseManagementServiceUrl: String = ""
@@ -137,7 +137,7 @@ class ArtifactoryNpmMavenPluginMojo : AbstractMojo() {
         val commandExecutor = CommandExecutorServiceImpl()
         val jfrogCliService = JFrogNpmCliServiceImpl(commandExecutor)
         val buildInfoService = ArtifactoryBuildInfoServiceImpl(createArtifactoryClient())
-        val dependenciesBuildInfoResolver = DependenciesBuildInfoResolverImpl(ServiceConfiguration(componentRegistryServiceUrl, releaseManagementServiceUrl))
+        val dependenciesBuildInfoResolver = DependenciesBuildInfoResolverImpl(ServiceConfiguration(componentsRegistryServiceUrl, releaseManagementServiceUrl))
 
         integrationService = NpmBuildInfoIntegrationServiceImpl(jfrogCliService, buildInfoService, dependenciesBuildInfoResolver)
     }

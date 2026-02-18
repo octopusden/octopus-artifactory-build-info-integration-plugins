@@ -4,6 +4,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.gradle.api.GradleException
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.octopusden.octopus.artifactory.build.info.integration.dto.DependencyVersion
 import java.io.File
@@ -14,6 +15,7 @@ abstract class IntegrateNpmBuildInfoTask : BaseNpmBuildInfoTask() {
     abstract val packageJsonPath: Property<String>
 
     @get:Input
+    @get:Optional
     abstract val dependenciesFilePath: Property<String>
 
     @TaskAction

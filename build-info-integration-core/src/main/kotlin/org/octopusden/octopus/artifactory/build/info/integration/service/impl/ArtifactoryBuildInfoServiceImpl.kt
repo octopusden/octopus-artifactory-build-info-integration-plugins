@@ -29,12 +29,20 @@ class ArtifactoryBuildInfoServiceImpl(
         }
 
     override fun getNpmDependenciesModules(dependencies: List<DependencyBuildInfo>): List<Module> =
-        dependencies.flatMap { buildInfo ->
-            logger.info("Retrieving build info for dependency build ${buildInfo.buildName}:${buildInfo.buildNumber}")
-            val dependencyBuildInfo = artifactoryClient.getBuildInfo(buildInfo.buildName, buildInfo.buildNumber).buildInfo
-            dependencyBuildInfo.modules
-                ?.filter { it.type == "npm" }
-                ?: emptyList()
+        dependencies.flatMap { dependency ->
+            logger.info("Retrieving build info for dependency build ${dependency.buildName}:${dependency.buildNumber}")
+            try {
+                val dependencyBuildInfo = artifactoryClient.getBuildInfo(dependency.buildName, dependency.buildNumber).buildInfo
+                dependencyBuildInfo.modules
+                    ?.filter { it.type == "npm" }
+                    ?: emptyList()
+            } catch (e: NotFoundException) {
+                logger.warn("Build info for dependency build ${dependency.buildName}:${dependency.buildNumber} not found. Skipping.", e)
+                emptyList()
+            } catch (e: ArtifactoryClientException) {
+                logger.error("Error retrieving build info for dependency build ${dependency.buildName}:${dependency.buildNumber}. Skipping.", e)
+                emptyList()
+            }
         }.distinctBy { it.id }
 
     override fun mergeBuildInfo(mavenBuildInfo: BuildInfo, npmBuildInfo: BuildInfo?, npmDependenciesModules: List<Module>): BuildInfo {

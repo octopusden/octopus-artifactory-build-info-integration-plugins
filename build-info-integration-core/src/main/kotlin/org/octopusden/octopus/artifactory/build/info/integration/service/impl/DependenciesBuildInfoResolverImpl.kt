@@ -6,6 +6,7 @@ import org.octopusden.octopus.artifactory.build.info.integration.dto.DependencyV
 import org.octopusden.octopus.artifactory.build.info.integration.service.DependenciesBuildInfoResolver
 import org.octopusden.octopus.components.registry.client.impl.ClassicComponentsRegistryServiceClient
 import org.octopusden.octopus.components.registry.client.impl.ClassicComponentsRegistryServiceClientUrlProvider
+import org.octopusden.octopus.releasemanagementservice.client.common.exception.ReleaseManagementServiceException
 import org.octopusden.octopus.releasemanagementservice.client.impl.ClassicReleaseManagementServiceClient
 import org.octopusden.octopus.releasemanagementservice.client.impl.ReleaseManagementServiceClientParametersProvider
 import org.slf4j.LoggerFactory
@@ -29,8 +30,8 @@ class DependenciesBuildInfoResolverImpl(
             object : ReleaseManagementServiceClientParametersProvider {
                 override fun getApiUrl() = serviceConfiguration.releaseManagementServiceUrl
                 override fun getTimeRetryInMillis() = 180000
-                override fun getConnectTimeoutInMillis() = 0
-                override fun getReadTimeoutInMillis() = 0
+                override fun getConnectTimeoutInMillis() = 30000
+                override fun getReadTimeoutInMillis() = 60000
             }
         )
     }
@@ -55,15 +56,18 @@ class DependenciesBuildInfoResolverImpl(
 
             if (!visited.add(key)) continue
 
-            val build = releaseManagementServiceClient.getBuild(component, version)
-            result.add(
-                DependencyBuildInfo(
-                    buildName = getComponentBuildName(component),
-                    buildNumber = build.version
+            try {
+                val build = releaseManagementServiceClient.getBuild(component, version)
+                result.add(
+                    DependencyBuildInfo(
+                        buildName = getComponentBuildName(component),
+                        buildNumber = build.version
+                    )
                 )
-            )
-
-            build.dependencies.forEach { queue.add(it.component to it.version) }
+                build.dependencies.forEach { queue.add(it.component to it.version) }
+            } catch (e: ReleaseManagementServiceException) {
+                logger.warn("Failed to get dependencies from $component to $version", e)
+            }
         }
 
         return result

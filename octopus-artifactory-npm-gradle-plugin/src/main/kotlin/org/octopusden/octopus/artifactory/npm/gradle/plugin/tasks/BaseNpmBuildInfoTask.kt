@@ -43,7 +43,7 @@ abstract class BaseNpmBuildInfoTask : DefaultTask() {
     abstract val skipWaitForXrayScan: Property<Boolean>
 
     @get:Input
-    abstract val componentRegistryServiceUrl: Property<String>
+    abstract val componentsRegistryServiceUrl: Property<String>
 
     @get:Input
     abstract val releaseManagementServiceUrl: Property<String>
@@ -55,7 +55,7 @@ abstract class BaseNpmBuildInfoTask : DefaultTask() {
         val commandExecutor = CommandExecutorServiceImpl()
         val jfrogCliService = JFrogNpmCliServiceImpl(commandExecutor)
         val buildInfoService = ArtifactoryBuildInfoServiceImpl(createArtifactoryClient())
-        val dependenciesBuildInfoResolver = DependenciesBuildInfoResolverImpl(ServiceConfiguration(getComponentRegistryServiceUrl(), getReleaseManagementServiceUrl()))
+        val dependenciesBuildInfoResolver = DependenciesBuildInfoResolverImpl(ServiceConfiguration(getComponentsRegistryServiceUrl(), getReleaseManagementServiceUrl()))
 
         integrationService = NpmBuildInfoIntegrationServiceImpl(jfrogCliService, buildInfoService, dependenciesBuildInfoResolver)
     }
@@ -119,7 +119,7 @@ abstract class BaseNpmBuildInfoTask : DefaultTask() {
 
     private fun getBuildNumber(): String = getProjectOrSettingsProperty("buildInfo.build.number", buildNumber)
 
-    private fun getComponentRegistryServiceUrl(): String = getProjectOrSettingsProperty("component-registry-service-url", componentRegistryServiceUrl)
+    private fun getComponentsRegistryServiceUrl(): String = getProjectOrSettingsProperty("component-registry-service-url", componentsRegistryServiceUrl)
 
     private fun getReleaseManagementServiceUrl(): String = getProjectOrSettingsProperty("release-management-service-url", releaseManagementServiceUrl)
 

@@ -24,7 +24,7 @@ class ArtifactoryNpmTaskConfiguration(
             task.npmBuildNameSuffix.set(settings.npmBuildNameSuffix)
             task.packageJsonPath.set(settings.packageJsonPath)
             task.dependenciesFilePath.set(settings.dependenciesFilePath)
-            task.componentRegistryServiceUrl.set(settings.componentRegistryServiceUrl)
+            task.componentsRegistryServiceUrl.set(settings.componentsRegistryServiceUrl)
             task.releaseManagementServiceUrl.set(settings.releaseManagementServiceUrl)
             task.cleanupNpmBuildInfo.set(settings.cleanupNpmBuildInfo)
             task.skipWaitForXrayScan.set(settings.skipWaitForXrayScan)

@@ -9,7 +9,7 @@ abstract class ArtifactoryNpmSettings {
     abstract val npmRepository: Property<String>
     abstract val packageJsonPath: Property<String>
     abstract val dependenciesFilePath: Property<String>
-    abstract val componentRegistryServiceUrl: Property<String>
+    abstract val componentsRegistryServiceUrl: Property<String>
     abstract val releaseManagementServiceUrl: Property<String>
     abstract val skip: Property<Boolean>
     abstract val cleanupNpmBuildInfo: Property<Boolean>
