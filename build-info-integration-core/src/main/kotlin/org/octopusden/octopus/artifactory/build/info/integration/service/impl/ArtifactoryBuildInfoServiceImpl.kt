@@ -40,7 +40,7 @@ class ArtifactoryBuildInfoServiceImpl(
                 logger.warn("Build info for dependency build ${dependency.buildName}:${dependency.buildNumber} not found. Skipping: ${e.message}")
                 emptyList()
             } catch (e: ArtifactoryClientException) {
-                logger.warn("Error retrieving build info for dependency build ${dependency.buildName}:${dependency.buildNumber}. Skipping: ${e.message}")
+                logger.warn("Error retrieving build info for dependency build ${dependency.buildName}:${dependency.buildNumber}. Skipping: ${e.message}", e)
                 emptyList()
             }
         }.distinctBy { it.id }
@@ -53,8 +53,10 @@ class ArtifactoryBuildInfoServiceImpl(
         val mergedModules = (mavenBuildInfo.modules?.toList() ?: emptyList()).toMutableList()
         mergedModules += npmBuildInfo?.modules?.map { it.copy(artifacts = emptyList()) } ?: emptyList()
 
-        logger.info("Merging ${npmDependenciesModules.size} NPM dependency modules into Maven build info (${mavenBuildInfo.name}:${mavenBuildInfo.number})")
-        mergedModules += npmDependenciesModules.map { it.copy(artifacts = emptyList()) }
+        if (npmDependenciesModules.isNotEmpty()) {
+            logger.info("Merging ${npmDependenciesModules.size} NPM dependency modules into Maven build info (${mavenBuildInfo.name}:${mavenBuildInfo.number})")
+            mergedModules += npmDependenciesModules.map { it.copy(artifacts = emptyList()) }
+        }
 
         return BuildInfo(
             mavenBuildInfo.name,
