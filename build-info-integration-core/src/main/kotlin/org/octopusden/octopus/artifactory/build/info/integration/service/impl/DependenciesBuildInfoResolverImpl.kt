@@ -67,6 +67,8 @@ class DependenciesBuildInfoResolverImpl(
                 build.dependencies.forEach { queue.add(it.component to it.version) }
             } catch (e: ReleaseManagementServiceException) {
                 logger.warn("Failed to get dependencies from $component to $version", e)
+            } catch (e: Exception) {
+                logger.error("Unexpected error while getting dependencies from $component to $version", e)
             }
         }
 

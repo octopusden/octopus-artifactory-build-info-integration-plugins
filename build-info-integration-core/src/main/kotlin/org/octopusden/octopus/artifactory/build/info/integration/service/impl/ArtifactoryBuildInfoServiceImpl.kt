@@ -64,7 +64,7 @@ class ArtifactoryBuildInfoServiceImpl(
             mavenBuildInfo.buildAgent,
             mavenBuildInfo.started,
             null,
-            mergedModules,
+            mergedModules.distinctBy { it.id },
             mavenBuildInfo.statuses
         )
     }
