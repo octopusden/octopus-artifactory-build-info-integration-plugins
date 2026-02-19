@@ -30,10 +30,9 @@ abstract class IntegrateNpmBuildInfoTask : BaseNpmBuildInfoTask() {
             val buildInfoConfiguration = createBuildInfoConfiguration()
             val artifactoryConfiguration = createArtifactoryConfiguration()
 
-            val packageJsonDir = getPackageJsonPath()
-            val packageJsonAvailable = isPackageJsonFileAvailable(packageJsonDir)
+            val packageJsonDir = resolvePackageJsonDir()
 
-            if (packageJsonAvailable) {
+            if (packageJsonDir != null) {
                 integrationService.generateNpmBuildInfo(
                     packageJsonDir.absolutePath,
                     buildInfoConfiguration,
@@ -42,12 +41,12 @@ abstract class IntegrateNpmBuildInfoTask : BaseNpmBuildInfoTask() {
             }
 
             val dependencies = resolveDependencies()
-            if (!packageJsonAvailable && dependencies.isEmpty()) {
+            if (packageJsonDir == null && dependencies.isEmpty()) {
                 logger.lifecycle("No package.json found and no dependencies resolved, skipping NPM build info integration")
                 return
             }
 
-            integrationService.integrateNpmBuildInfo(buildInfoConfiguration, dependencies, !packageJsonAvailable, skipWaitForXrayScan.get())
+            integrationService.integrateNpmBuildInfo(buildInfoConfiguration, dependencies, packageJsonDir == null, skipWaitForXrayScan.get())
             logger.lifecycle("NPM build info integrated successfully")
 
         } catch (e: Exception) {
@@ -56,19 +55,21 @@ abstract class IntegrateNpmBuildInfoTask : BaseNpmBuildInfoTask() {
         }
     }
 
-    private fun getPackageJsonPath(): File {
+    private fun resolvePackageJsonDir(): File? {
         val path = packageJsonPath.get()
         val dir = if (path.isEmpty()) project.projectDir else File(project.projectDir, path)
         if (!dir.isDirectory) {
-            throw GradleException("packageJsonPath must be a directory: ${dir.absolutePath}")
+            logger.warn("packageJsonPath is not a valid directory: ${dir.absolutePath}, skipping NPM build info generation")
+            return null
+        }
+        val packageJsonFile = File(dir, "package.json")
+        if (!packageJsonFile.exists() || !packageJsonFile.isFile) {
+            logger.warn("package.json not found in ${dir.absolutePath}, skipping NPM build info generation")
+            return null
         }
         return dir
     }
 
-    private fun isPackageJsonFileAvailable(packageJsonPath: File): Boolean {
-        val packageJsonFile = File(packageJsonPath, "package.json")
-        return packageJsonFile.exists() && packageJsonFile.isFile
-    }
 
     private fun resolveDependencies(): List<DependencyVersion> {
         val dependenciesFile = getDependenciesFile() ?: return emptyList()
@@ -82,15 +83,13 @@ abstract class IntegrateNpmBuildInfoTask : BaseNpmBuildInfoTask() {
     }
 
     private fun getDependenciesFile(): File? {
-        var dependenciesFile: File
-        try {
-            getProjectOrSettingsProperty("dependenciesFilePath", dependenciesFilePath)
-        } catch (_: GradleException) {
+        val filePath = (project.findProperty("dependenciesFilePath") as? String)?.takeIf { it.isNotBlank() }
+            ?: dependenciesFilePath.orNull?.takeIf { it.isNotBlank() }
+        if (filePath == null) {
             logger.warn("dependenciesFilePath property is not set, skipping dependencies resolution")
             return null
-        }.let {
-            dependenciesFile = File(project.projectDir, it)
         }
+        val dependenciesFile = File(project.projectDir, filePath)
         if (!dependenciesFile.exists() || !dependenciesFile.isFile) {
             logger.warn("Dependencies file does not exist or is not a file: ${dependenciesFile.absolutePath}, skipping dependencies resolution")
             return null
