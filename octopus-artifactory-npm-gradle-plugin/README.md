@@ -75,7 +75,8 @@ The plugin automatically triggers **only if** these project properties are speci
 - `buildInfo.build.name` - Gradle build info name to append
 - `buildInfo.build.number` - Gradle build info number to append
 
-Other required properties to be set:
+Other required properties to be set (if dependencies resolution from dependencies.json is needed):
+- `dependenciesFilePath` - Path to the dependencies.json file containing direct NPM dependencies
 - `component-registry-service-url` - URL of the Component Registry Service (CRS) to fetch component information of NPM dependencies
 - `release-management-service-url` - URL of the Release Management Service (RMS) to fetch dependencies information for NPM dependencies
 

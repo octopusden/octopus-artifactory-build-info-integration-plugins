@@ -32,7 +32,7 @@ class GradleFunctionalTest: BaseFunctionalTest() {
         val instance = gradleProcessInstance {
             testProjectName = "gradle-projects/simple-project"
             tasks = defaultTasks
-            additionalArguments = artifactoryProperties + serviceProperties + listOf(
+            additionalArguments = artifactoryProperties + listOf(
                 "-Pversion=$buildNumber",
                 "-PbuildInfo.build.name=$buildName",
                 "-PbuildInfo.build.number=$buildNumber"
@@ -66,7 +66,7 @@ class GradleFunctionalTest: BaseFunctionalTest() {
         val instance = gradleProcessInstance {
             testProjectName = "gradle-projects/simple-project"
             tasks = defaultTasks
-            additionalArguments = artifactoryProperties + serviceProperties + listOf(
+            additionalArguments = artifactoryProperties + listOf(
                 "-Pversion=$buildNumber"
             )
         }
@@ -84,7 +84,7 @@ class GradleFunctionalTest: BaseFunctionalTest() {
         val instance = gradleProcessInstance {
             testProjectName = "gradle-projects/simple-project"
             tasks = defaultTasks
-            additionalArguments = serviceProperties + listOf(
+            additionalArguments = listOf(
                 "-Pversion=$buildNumber",
                 "-PbuildInfo.build.name=$buildName",
                 "-PbuildInfo.build.number=$buildNumber",
@@ -105,7 +105,7 @@ class GradleFunctionalTest: BaseFunctionalTest() {
         val instance = gradleProcessInstance {
             testProjectName = "gradle-projects/missing-package-json"
             tasks = defaultTasks
-            additionalArguments = artifactoryProperties + serviceProperties + listOf(
+            additionalArguments = artifactoryProperties + listOf(
                 "-Pversion=$buildNumber",
                 "-PbuildInfo.build.name=$buildName",
                 "-PbuildInfo.build.number=$buildNumber",

@@ -137,9 +137,10 @@ class ArtifactoryNpmMavenPluginMojo : AbstractMojo() {
         val commandExecutor = CommandExecutorServiceImpl()
         val jfrogCliService = JFrogNpmCliServiceImpl(commandExecutor)
         val buildInfoService = ArtifactoryBuildInfoServiceImpl(createArtifactoryClient())
-        val dependenciesBuildInfoResolver = DependenciesBuildInfoResolverImpl(ServiceConfiguration(componentsRegistryServiceUrl, releaseManagementServiceUrl))
 
-        integrationService = NpmBuildInfoIntegrationServiceImpl(jfrogCliService, buildInfoService, dependenciesBuildInfoResolver)
+        integrationService = NpmBuildInfoIntegrationServiceImpl(jfrogCliService, buildInfoService) {
+            DependenciesBuildInfoResolverImpl(ServiceConfiguration(componentsRegistryServiceUrl, releaseManagementServiceUrl))
+        }
     }
 
     private fun createArtifactoryClient(): ArtifactoryClient {

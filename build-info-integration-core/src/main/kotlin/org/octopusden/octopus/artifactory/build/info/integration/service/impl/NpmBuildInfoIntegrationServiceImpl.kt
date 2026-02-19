@@ -14,10 +14,12 @@ import java.util.concurrent.TimeUnit
 class NpmBuildInfoIntegrationServiceImpl(
     private val jfrogNpmCliService: JFrogNpmCliService,
     private val buildInfoService: ArtifactoryBuildInfoService,
-    private val dependenciesBuildInfoResolver: DependenciesBuildInfoResolver
+    private val dependenciesBuildInfoResolverProvider: () -> DependenciesBuildInfoResolver
 ) : NpmBuildInfoIntegrationService {
 
     private val logger = LoggerFactory.getLogger(NpmBuildInfoIntegrationServiceImpl::class.java)
+
+    private val dependenciesBuildInfoResolver by lazy { dependenciesBuildInfoResolverProvider() }
 
     override fun generateNpmBuildInfo(
         packageJsonPath: String,
@@ -50,7 +52,12 @@ class NpmBuildInfoIntegrationServiceImpl(
             logger.debug("Skipping retrieval of direct NPM build info as per configuration")
             null
         }
-        val npmDependenciesModules = buildInfoService.getNpmDependenciesModules(dependenciesBuildInfoResolver.getAllDependenciesBuildInfo(directDependencies))
+        val npmDependenciesModules = if (directDependencies.isNotEmpty()) {
+            buildInfoService.getNpmDependenciesModules(dependenciesBuildInfoResolver.getAllDependenciesBuildInfo(directDependencies))
+        } else {
+            logger.debug("No direct dependencies provided for NPM build info integration")
+            emptyList()
+        }
         val mergedBuildInfo = buildInfoService.mergeBuildInfo(mavenBuildInfo, npmBuildInfo, npmDependenciesModules)
 
         if (skipWaitForXrayScan) {

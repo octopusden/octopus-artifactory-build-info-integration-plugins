@@ -58,17 +58,17 @@ class DependenciesBuildInfoResolverImpl(
 
             try {
                 val build = releaseManagementServiceClient.getBuild(component, version)
+                build.dependencies.forEach { queue.add(it.component to it.version) }
                 result.add(
                     DependencyBuildInfo(
                         buildName = getComponentBuildName(component),
                         buildNumber = build.version
                     )
                 )
-                build.dependencies.forEach { queue.add(it.component to it.version) }
             } catch (e: ReleaseManagementServiceException) {
-                logger.warn("Failed to get dependencies from $component:$version", e)
+                logger.warn("Failed to get build info for $component:$version", e)
             } catch (e: Exception) {
-                logger.error("Unexpected error while getting dependencies from $component:$version", e)
+                logger.error("Unexpected error while processing $component:$version", e)
             }
         }
 

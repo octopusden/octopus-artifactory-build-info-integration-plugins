@@ -6,6 +6,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Optional
 import org.octopusden.octopus.artifactory.build.info.integration.configuration.ArtifactoryConfiguration
 import org.octopusden.octopus.artifactory.build.info.integration.configuration.BuildInfoConfiguration
 import org.octopusden.octopus.artifactory.build.info.integration.configuration.ServiceConfiguration
@@ -43,9 +44,11 @@ abstract class BaseNpmBuildInfoTask : DefaultTask() {
     abstract val skipWaitForXrayScan: Property<Boolean>
 
     @get:Input
+    @get:Optional
     abstract val componentsRegistryServiceUrl: Property<String>
 
     @get:Input
+    @get:Optional
     abstract val releaseManagementServiceUrl: Property<String>
 
     @get:Internal
@@ -55,9 +58,10 @@ abstract class BaseNpmBuildInfoTask : DefaultTask() {
         val commandExecutor = CommandExecutorServiceImpl()
         val jfrogCliService = JFrogNpmCliServiceImpl(commandExecutor)
         val buildInfoService = ArtifactoryBuildInfoServiceImpl(createArtifactoryClient())
-        val dependenciesBuildInfoResolver = DependenciesBuildInfoResolverImpl(ServiceConfiguration(getComponentsRegistryServiceUrl(), getReleaseManagementServiceUrl()))
 
-        integrationService = NpmBuildInfoIntegrationServiceImpl(jfrogCliService, buildInfoService, dependenciesBuildInfoResolver)
+        integrationService = NpmBuildInfoIntegrationServiceImpl(jfrogCliService, buildInfoService) {
+            DependenciesBuildInfoResolverImpl(ServiceConfiguration(getComponentsRegistryServiceUrl(), getReleaseManagementServiceUrl()))
+        }
     }
 
     protected fun createBuildInfoConfiguration(): BuildInfoConfiguration {
