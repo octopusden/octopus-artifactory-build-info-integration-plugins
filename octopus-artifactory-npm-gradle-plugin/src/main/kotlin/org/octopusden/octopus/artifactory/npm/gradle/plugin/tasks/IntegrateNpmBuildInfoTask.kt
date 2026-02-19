@@ -74,19 +74,14 @@ abstract class IntegrateNpmBuildInfoTask : BaseNpmBuildInfoTask() {
     private fun resolveDependencies(): List<DependencyVersion> {
         val dependenciesFile = getDependenciesFile() ?: return emptyList()
         val mapper = jacksonObjectMapper()
-        return try {
-            mapper.readValue(dependenciesFile, Array<DependencyVersion>::class.java).toList()
-        } catch (e: Exception) {
-            logger.warn("Failed to read dependencies from file: ${dependenciesFile.absolutePath}, skipping dependencies resolution. Error: ${e.message}")
-            emptyList()
-        }
+        return mapper.readValue(dependenciesFile, Array<DependencyVersion>::class.java).toList()
     }
 
     private fun getDependenciesFile(): File? {
         val filePath = (project.findProperty("dependenciesFilePath") as? String)?.takeIf { it.isNotBlank() }
             ?: dependenciesFilePath.orNull?.takeIf { it.isNotBlank() }
         if (filePath == null) {
-            logger.warn("dependenciesFilePath property is not set, skipping dependencies resolution")
+            logger.info("dependenciesFilePath property is not set, skipping dependencies resolution")
             return null
         }
         val dependenciesFile = File(project.projectDir, filePath)
