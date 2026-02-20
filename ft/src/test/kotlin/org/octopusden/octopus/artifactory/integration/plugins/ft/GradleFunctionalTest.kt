@@ -96,7 +96,7 @@ class GradleFunctionalTest: BaseFunctionalTest() {
     }
 
     @Test
-    fun testMissingPackageJsonFile() {
+    fun testUnspecifiedPackageJsonPathWithNoPackageJsonFile() {
         val buildName = "simple-project-gradle"
         val buildNumber = "2.0.3"
 
@@ -113,6 +113,27 @@ class GradleFunctionalTest: BaseFunctionalTest() {
         }
 
         assertFailedOperations(instance, "No package.json found and no dependencies resolved, skipping NPM build info integration", buildName, buildNumber)
+    }
+
+    @Test
+    fun testInvalidPackageJsonPath() {
+        val buildName = "simple-project-gradle"
+        val buildNumber = "2.0.4"
+
+        assertBuildInfoNotFound(buildName, buildNumber)
+
+        val instance = gradleProcessInstance {
+            testProjectName = "gradle-projects/missing-package-json"
+            tasks = defaultTasks
+            additionalArguments = artifactoryProperties + listOf(
+                "-Pversion=$buildNumber",
+                "-PbuildInfo.build.name=$buildName",
+                "-PbuildInfo.build.number=$buildNumber",
+                "-PpackageJsonPath=nonexistent/path"
+            )
+        }
+
+        assertFailedOperations(instance, "packageJsonPath 'nonexistent/path' is not a valid directory:", buildName, buildNumber)
     }
 
     /**

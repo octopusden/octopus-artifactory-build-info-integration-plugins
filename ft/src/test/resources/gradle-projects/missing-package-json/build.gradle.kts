@@ -48,6 +48,7 @@ artifactoryNpm {
     configuration {
         cleanupNpmBuildInfo.set(false)
         skipWaitForXrayScan.set(true)
+        packageJsonPath.set(project.findProperty("packageJsonPath")?.toString() ?: "")
     }
 }
 

@@ -57,14 +57,20 @@ abstract class IntegrateNpmBuildInfoTask : BaseNpmBuildInfoTask() {
 
     private fun resolvePackageJsonDir(): File? {
         val path = packageJsonPath.get()
-        val dir = if (path.isEmpty()) project.projectDir else File(project.projectDir, path)
+        val isExplicitlyConfigured = path.isNotEmpty()
+        val dir = if (isExplicitlyConfigured) File(project.projectDir, path) else project.projectDir
         if (!dir.isDirectory) {
-            logger.warn("packageJsonPath is not a valid directory: ${dir.absolutePath}, skipping NPM build info generation")
+            if (isExplicitlyConfigured) {
+                throw GradleException("packageJsonPath '$path' is not a valid directory: ${dir.absolutePath}")
+            }
             return null
         }
         val packageJsonFile = File(dir, "package.json")
         if (!packageJsonFile.exists() || !packageJsonFile.isFile) {
-            logger.warn("package.json not found in ${dir.absolutePath}, skipping NPM build info generation")
+            if (isExplicitlyConfigured) {
+                throw GradleException("package.json not found in configured packageJsonPath: ${dir.absolutePath}")
+            }
+            logger.info("package.json not found in ${dir.absolutePath}, skipping NPM build info generation")
             return null
         }
         return dir
