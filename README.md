@@ -2,6 +2,10 @@
 
 A collection of plugins and services for integrating additional modules to existing build information produced by Maven and Gradle on JFrog Artifactory.
 
+## Architecture
+
+For a detailed architecture diagram showing how this project relates to other Octopus projects (octopus-rm-gradle-plugin, octopus-release-management-service, octopus-components-registry-service), see: [`docs/architecture.md`](./docs/architecture.md)
+
 ## Project Structure
 
 This project consists of **3 main modules** and **1 test module**:
