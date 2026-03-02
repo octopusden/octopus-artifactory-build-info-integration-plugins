@@ -25,12 +25,18 @@ abstract class IntegrateNpmBuildInfoTask : BaseNpmBuildInfoTask() {
 
     internal fun integrateNpmBuildInfo() {
         try {
+            val packageJsonDir = resolvePackageJsonDir()
+            val dependencies = resolveDependencies()
+            if (packageJsonDir == null && dependencies.isEmpty()) {
+                logger.lifecycle("No package.json found and no dependencies resolved, skipping NPM build info integration")
+                return
+            }
+
             initializeServices()
 
             val buildInfoConfiguration = createBuildInfoConfiguration()
             val artifactoryConfiguration = createArtifactoryConfiguration()
 
-            val packageJsonDir = resolvePackageJsonDir()
 
             if (packageJsonDir != null) {
                 integrationService.generateNpmBuildInfo(
@@ -40,15 +46,8 @@ abstract class IntegrateNpmBuildInfoTask : BaseNpmBuildInfoTask() {
                 )
             }
 
-            val dependencies = resolveDependencies()
-            if (packageJsonDir == null && dependencies.isEmpty()) {
-                logger.lifecycle("No package.json found and no dependencies resolved, skipping NPM build info integration")
-                return
-            }
-
             integrationService.integrateNpmBuildInfo(buildInfoConfiguration, dependencies, packageJsonDir == null, skipWaitForXrayScan.get())
             logger.lifecycle("NPM build info integrated successfully")
-
         } catch (e: Exception) {
             logger.error("Failed to integrate NPM build info: ${e.message}", e)
             throw GradleException("Failed to integrate NPM build info", e)

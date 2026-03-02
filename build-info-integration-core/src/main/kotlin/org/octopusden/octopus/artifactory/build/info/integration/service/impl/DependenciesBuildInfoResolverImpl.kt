@@ -80,8 +80,13 @@ class DependenciesBuildInfoResolverImpl(
     private fun getComponentBuildName(component: String): String =
         buildNameCache.getOrPut(component) {
             val distribution = componentsRegistryServiceClient.getById(component).distribution
-            val explicitFlag = if (distribution?.explicit == true) "e" else "i"
-            val externalFlag = if (distribution?.external == true) "e" else "i"
+            val explicitFlag = if (distribution?.explicit == true) EXPLICIT_EXTERNAL_FLAG else IMPLICIT_INTERNAL_FLAG
+            val externalFlag = if (distribution?.external == true) EXPLICIT_EXTERNAL_FLAG else IMPLICIT_INTERNAL_FLAG
             "${component}_${explicitFlag}${externalFlag}"
         }
+
+    companion object {
+        private const val EXPLICIT_EXTERNAL_FLAG = "e"
+        private const val IMPLICIT_INTERNAL_FLAG = "i"
+    }
 }
