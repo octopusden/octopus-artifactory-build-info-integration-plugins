@@ -66,3 +66,40 @@ Currently, the system uses a hardcoded 1-minute sleep (`Thread.sleep()`) before 
    - Poll with exponential backoff until scan is complete or timeout
 2. Implement retry logic with proper error handling
 3. Add logging to indicate polling progress
+
+---
+
+### [TD-003] 🟡 Implement Dependency NPM Modules Generation Support in Maven Plugin
+
+**Status:** Open  
+**Priority:** Medium  
+**Component:** octopus-artifactory-npm-maven-plugin
+
+#### Problem
+The Gradle plugin (`octopus-artifactory-npm-gradle-plugin`) supports collecting NPM modules from the dependency graph, but the Maven plugin currently only supports collecting NPM modules from `package.json`. This creates a **feature parity gap** between the two plugins.
+
+**Gradle plugin capabilities (already implemented):**
+1. Collect NPM modules from `package.json` (if present)
+2. Collect NPM modules from dependency graph:
+   - Read `dependencies.json` file (specified via `dependenciesFilePath` or project property)
+   - Resolve transitive dependencies via Release Management Service
+   - Retrieve build info from Artifactory for each dependency
+   - Extract NPM modules from dependency build info
+
+**Maven plugin capabilities (current):**
+1. Collect NPM modules from `package.json` only ❌ Missing dependency graph support
+
+#### Impact
+- **Feature Parity**: Maven users cannot leverage dependency-based NPM module collection
+- **Consistency**: Different behavior between Gradle and Maven plugins for the same use case
+- **Usability**: Maven projects with NPM dependencies in sub-modules cannot integrate them properly
+
+#### Suggested Approach
+1. Implement `resolveDependencies()` method in Maven plugin
+2. Add required Maven properties:
+   - `component-registry-service-url` - URL of the Component Registry Service (CRS)
+   - `release-management-service-url` - URL of the Release Management Service (RMS)
+   - `dependenciesFilePath` - Path to dependencies JSON file (optional)
+3. Update plugin documentation with new required/optional properties
+4. Add integration tests for dependency graph feature
+

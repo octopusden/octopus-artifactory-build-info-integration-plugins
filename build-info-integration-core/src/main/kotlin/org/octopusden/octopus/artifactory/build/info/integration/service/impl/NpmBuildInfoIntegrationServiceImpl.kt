@@ -2,8 +2,10 @@ package org.octopusden.octopus.artifactory.build.info.integration.service.impl
 
 import org.octopusden.octopus.artifactory.build.info.integration.configuration.ArtifactoryConfiguration
 import org.octopusden.octopus.artifactory.build.info.integration.configuration.BuildInfoConfiguration
+import org.octopusden.octopus.artifactory.build.info.integration.dto.DependencyVersion
 import org.octopusden.octopus.artifactory.build.info.integration.exception.ConfigurationException
 import org.octopusden.octopus.artifactory.build.info.integration.service.ArtifactoryBuildInfoService
+import org.octopusden.octopus.artifactory.build.info.integration.service.DependenciesBuildInfoResolver
 import org.octopusden.octopus.artifactory.build.info.integration.service.JFrogNpmCliService
 import org.octopusden.octopus.artifactory.build.info.integration.service.NpmBuildInfoIntegrationService
 import org.slf4j.LoggerFactory
@@ -11,10 +13,13 @@ import java.util.concurrent.TimeUnit
 
 class NpmBuildInfoIntegrationServiceImpl(
     private val jfrogNpmCliService: JFrogNpmCliService,
-    private val buildInfoService: ArtifactoryBuildInfoService
+    private val buildInfoService: ArtifactoryBuildInfoService,
+    private val dependenciesBuildInfoResolverProvider: () -> DependenciesBuildInfoResolver
 ) : NpmBuildInfoIntegrationService {
 
     private val logger = LoggerFactory.getLogger(NpmBuildInfoIntegrationServiceImpl::class.java)
+
+    private val dependenciesBuildInfoResolver by lazy { dependenciesBuildInfoResolverProvider() }
 
     override fun generateNpmBuildInfo(
         packageJsonPath: String,
@@ -32,12 +37,28 @@ class NpmBuildInfoIntegrationServiceImpl(
         jfrogNpmCliService.publishNpmBuildInfo(packageJsonPath, buildInfoConfig.npmBuildName, buildInfoConfig.buildNumber, artifactoryConfig)
     }
 
-    override fun integrateNpmBuildInfo(buildInfoConfig: BuildInfoConfiguration, skipWaitForXrayScan: Boolean) {
+    override fun integrateNpmBuildInfo(
+        buildInfoConfig: BuildInfoConfiguration,
+        directDependencies: List<DependencyVersion>,
+        skipDirectNpmDependenciesGeneration: Boolean,
+        skipWaitForXrayScan: Boolean
+    ) {
         logger.info("Integrate NPM build info into Maven build info for build ${buildInfoConfig.buildName}:${buildInfoConfig.buildNumber}")
 
         val mavenBuildInfo = buildInfoService.getBuildInfo(buildInfoConfig.buildName, buildInfoConfig.buildNumber)
-        val npmBuildInfo = buildInfoService.getBuildInfo(buildInfoConfig.npmBuildName, buildInfoConfig.buildNumber)
-        val mergedBuildInfo = buildInfoService.mergeBuildInfo(mavenBuildInfo, npmBuildInfo)
+        val npmBuildInfo = if (!skipDirectNpmDependenciesGeneration) {
+            buildInfoService.getBuildInfo(buildInfoConfig.npmBuildName, buildInfoConfig.buildNumber)
+        } else {
+            logger.debug("Skipping retrieval of direct NPM build info as per configuration")
+            null
+        }
+        val npmDependenciesModules = if (directDependencies.isNotEmpty()) {
+            buildInfoService.getNpmDependenciesModules(dependenciesBuildInfoResolver.getAllDependenciesBuildInfo(directDependencies))
+        } else {
+            logger.debug("No direct dependencies provided for NPM build info integration")
+            emptyList()
+        }
+        val mergedBuildInfo = buildInfoService.mergeBuildInfo(mavenBuildInfo, npmBuildInfo, npmDependenciesModules)
 
         if (skipWaitForXrayScan) {
             logger.debug("Skipping wait for Xray indexing before uploading merged build info as per configuration")

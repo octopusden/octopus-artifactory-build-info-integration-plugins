@@ -44,7 +44,7 @@ objects:
 
       initContainers:
         - name: setup-artifactory-config
-          image: releases-docker.jfrog.io/jfrog/artifactory-oss:7.125.7
+          image: releases-docker.jfrog.io/jfrog/artifactory-oss:7.125.11
           command:
             - sh
             - -c
@@ -74,7 +74,7 @@ objects:
 
       containers:
         - name: artifactory
-          image: releases-docker.jfrog.io/jfrog/artifactory-oss:7.125.7
+          image: releases-docker.jfrog.io/jfrog/artifactory-oss:7.125.11
           ports:
             - containerPort: 8081
             - containerPort: 8082

@@ -20,17 +20,22 @@ publishing {
 }
 
 artifactory {
-    setContextUrl(System.getProperty("artifactory.url") + "/artifactory")
+    setContextUrl((System.getProperty("artifactory.url") ?: error("artifactory.url system property is required")) + "/artifactory")
     publish {
+        val buildName = project.findProperty("buildInfo.build.name")?.toString() ?: rootProject.name
+        val buildNumber = project.findProperty("buildInfo.build.number")?.toString() ?: version.toString()
+
         buildInfo {
-            buildName = System.getProperty("buildInfo.build.name") ?: rootProject.name
-            buildNumber = System.getProperty("buildInfo.build.number") ?: version.toString()
+            this.buildName = buildName
+            this.buildNumber = buildNumber
         }
+
         repository {
             repoKey = System.getProperty("artifactory.repoKey") ?: "example-repo-local"
             username = System.getProperty("artifactory.username") ?: "admin"
             password = System.getProperty("artifactory.password") ?: "password"
         }
+
         defaults {
             publications("maven")
             setPublishArtifacts(true)
@@ -43,6 +48,7 @@ artifactoryNpm {
     configuration {
         cleanupNpmBuildInfo.set(false)
         skipWaitForXrayScan.set(true)
+        packageJsonPath.set(project.findProperty("packageJsonPath")?.toString() ?: "")
     }
 }
 

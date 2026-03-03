@@ -1,3 +1,5 @@
+import org.octopusden.octopus.task.ConfigureMockServer
+
 plugins {
     id("org.octopusden.octopus.oc-template")
 }
@@ -46,6 +48,11 @@ fun String.getPort() = when (this) {
 }
 fun getOkdInternalHost(serviceName: String) = "${ocTemplate.getPod(serviceName)}-service:${serviceName.getPort()}"
 
+val commonOkdParameters = mapOf(
+    "ACTIVE_DEADLINE_SECONDS" to "okdActiveDeadlineSeconds".getExt(),
+    "DOCKER_REGISTRY" to "dockerRegistry".getExt()
+)
+
 ocTemplate {
     enabled.set("testPlatform".getExt() == "okd")
 
@@ -61,10 +68,7 @@ ocTemplate {
 
     service("postgres") {
         templateFile.set(rootProject.layout.projectDirectory.file("okd/postgres.yaml"))
-        parameters.set(mapOf(
-            "ACTIVE_DEADLINE_SECONDS" to "okdActiveDeadlineSeconds".getExt(),
-            "DOCKER_REGISTRY" to "dockerRegistry".getExt()
-        ))
+        parameters.set(commonOkdParameters)
     }
 
     service("artifactory") {
@@ -74,6 +78,25 @@ ocTemplate {
             "POSTGRES_HOST" to getOkdInternalHost("postgres")
         ))
         dependsOn.set(listOf("postgres"))
+    }
+
+    service("mockserver") {
+        templateFile.set(rootProject.layout.projectDirectory.file("okd/mockserver.yaml"))
+        parameters.set(commonOkdParameters + mapOf(
+            "MOCK_SERVER_VERSION" to properties["mockserver.version"] as String
+        ))
+    }
+
+    service("comp-reg") {
+        templateFile.set(rootProject.layout.projectDirectory.file("okd/components-registry.yaml"))
+        val componentsRegistryWorkDir = layout.projectDirectory.dir("src/test/resources/components-registry").asFile.absolutePath
+        parameters.set(commonOkdParameters + mapOf(
+            "COMPONENTS_REGISTRY_SERVICE_VERSION" to properties["octopus-components-registry-service.version"] as String,
+            "AGGREGATOR_GROOVY_CONTENT" to file("$componentsRegistryWorkDir/src/Aggregator.groovy").readText(),
+            "DEFAULTS_GROOVY_CONTENT" to file("$componentsRegistryWorkDir/src/Defaults.groovy").readText(),
+            "TEST_COMPONENTS_GROOVY_CONTENT" to file("$componentsRegistryWorkDir/src/TestComponents.groovy").readText(),
+            "APPLICATION_DEV_CONTENT" to layout.projectDirectory.dir("$componentsRegistryWorkDir/components-registry-service.yaml").asFile.readText()
+        ))
     }
 
     isRequiredBy(tasks.test)
@@ -87,17 +110,28 @@ dependencies {
     testApi("com.platformlib:platformlib-process-local:${property("platformlib.version")}")
 }
 
+val configureMockServer by tasks.registering(ConfigureMockServer::class) {
+    host.set(ocTemplate.getOkdHost("mockserver"))
+    port.set(80)
+    dependsOn("ocCreate")
+}
+
+
 tasks.test {
     useJUnitPlatform()
 
     dependsOn(":octopus-artifactory-npm-maven-plugin:publishToMavenLocal")
     dependsOn(":octopus-artifactory-npm-gradle-plugin:publishToMavenLocal")
+    dependsOn(configureMockServer)
 
     doFirst {
         if ("testPlatform".getExt().isBlank()) {
             throw IllegalArgumentException("-Ptest.platform or env variable TEST_PLATFORM must be specified to run functional tests")
         }
         systemProperty("artifactoryTestHost", ocTemplate.getOkdHost("artifactory"))
+        systemProperty("componentsRegistryServiceUrl", "http://${ocTemplate.getOkdHost("comp-reg")}")
+        systemProperty("releaseManagementServiceUrl", "http://${ocTemplate.getOkdHost("mockserver")}")
         systemProperty("octopusArtifactoryIntegrationPluginVersion", project.version.toString())
     }
 }
+

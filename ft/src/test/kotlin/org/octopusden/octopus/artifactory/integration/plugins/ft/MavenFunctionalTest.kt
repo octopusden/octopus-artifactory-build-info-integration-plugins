@@ -15,6 +15,7 @@ class MavenFunctionalTest: BaseFunctionalTest() {
         "-DartifactoryUsername=$ARTIFACTORY_USERNAME",
         "-DartifactoryPassword=$ARTIFACTORY_PASSWORD"
     )
+    override val serviceProperties = emptyList<String>()
 
     @Test
     fun testSimpleProject() {

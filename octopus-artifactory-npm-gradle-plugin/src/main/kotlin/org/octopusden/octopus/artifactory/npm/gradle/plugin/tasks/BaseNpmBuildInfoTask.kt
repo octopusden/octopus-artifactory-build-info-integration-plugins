@@ -6,11 +6,14 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Optional
 import org.octopusden.octopus.artifactory.build.info.integration.configuration.ArtifactoryConfiguration
 import org.octopusden.octopus.artifactory.build.info.integration.configuration.BuildInfoConfiguration
+import org.octopusden.octopus.artifactory.build.info.integration.configuration.ServiceConfiguration
 import org.octopusden.octopus.artifactory.build.info.integration.service.NpmBuildInfoIntegrationService
 import org.octopusden.octopus.artifactory.build.info.integration.service.impl.ArtifactoryBuildInfoServiceImpl
 import org.octopusden.octopus.artifactory.build.info.integration.service.impl.CommandExecutorServiceImpl
+import org.octopusden.octopus.artifactory.build.info.integration.service.impl.DependenciesBuildInfoResolverImpl
 import org.octopusden.octopus.artifactory.build.info.integration.service.impl.JFrogNpmCliServiceImpl
 import org.octopusden.octopus.artifactory.build.info.integration.service.impl.NpmBuildInfoIntegrationServiceImpl
 import org.octopusden.octopus.infrastructure.artifactory.client.ArtifactoryClassicClient
@@ -19,7 +22,6 @@ import org.octopusden.octopus.infrastructure.client.commons.ClientParametersProv
 import org.octopusden.octopus.infrastructure.client.commons.CredentialProvider
 import org.octopusden.octopus.infrastructure.client.commons.StandardBasicCredCredentialProvider
 import org.octopusden.octopus.infrastructure.client.commons.StandardBearerTokenCredentialProvider
-import java.io.File
 
 abstract class BaseNpmBuildInfoTask : DefaultTask() {
 
@@ -41,6 +43,14 @@ abstract class BaseNpmBuildInfoTask : DefaultTask() {
     @get:Input
     abstract val skipWaitForXrayScan: Property<Boolean>
 
+    @get:Input
+    @get:Optional
+    abstract val componentsRegistryServiceUrl: Property<String>
+
+    @get:Input
+    @get:Optional
+    abstract val releaseManagementServiceUrl: Property<String>
+
     @get:Internal
     protected lateinit var integrationService: NpmBuildInfoIntegrationService
 
@@ -49,7 +59,9 @@ abstract class BaseNpmBuildInfoTask : DefaultTask() {
         val jfrogCliService = JFrogNpmCliServiceImpl(commandExecutor)
         val buildInfoService = ArtifactoryBuildInfoServiceImpl(createArtifactoryClient())
 
-        integrationService = NpmBuildInfoIntegrationServiceImpl(jfrogCliService, buildInfoService)
+        integrationService = NpmBuildInfoIntegrationServiceImpl(jfrogCliService, buildInfoService) {
+            DependenciesBuildInfoResolverImpl(ServiceConfiguration(getComponentsRegistryServiceUrl(), getReleaseManagementServiceUrl()))
+        }
     }
 
     protected fun createBuildInfoConfiguration(): BuildInfoConfiguration {
@@ -93,30 +105,34 @@ abstract class BaseNpmBuildInfoTask : DefaultTask() {
     }
 
     private fun getArtifactoryUrl(): String {
-        return getSystemProperty("artifactory.url")
-            ?: throw GradleException("System property 'artifactory.url' must be provided")
+        return getEnvOrSystemProperty("ARTIFACTORY_URL", "artifactory.url")
+            ?: throw GradleException("Environment variable 'ARTIFACTORY_URL' or system property 'artifactory.url' must be provided")
     }
 
-    private fun getArtifactoryAccessToken(): String? = getSystemProperty("artifactory.accessToken")
+    private fun getArtifactoryAccessToken(): String? = getEnvOrSystemProperty("ARTIFACTORY_ACCESS_TOKEN", "artifactory.accessToken")
 
-    private fun getArtifactoryUsername(): String? = getSystemProperty("artifactory.username")
+    private fun getArtifactoryUsername(): String? = getEnvOrSystemProperty("ARTIFACTORY_DEPLOYER_USERNAME", "artifactory.username")
 
-    private fun getArtifactoryPassword(): String? = getSystemProperty("artifactory.password")
+    private fun getArtifactoryPassword(): String? = getEnvOrSystemProperty("ARTIFACTORY_DEPLOYER_PASSWORD", "artifactory.password")
 
-    private fun getSystemProperty(key: String): String? {
-        return System.getProperty(key)?.takeIf { it.isNotBlank() }
-    }
+    private fun getEnvOrSystemProperty(envVariable: String, systemPropertyName: String): String? =
+        System.getenv(envVariable)?.takeIf { it.isNotBlank() }
+            ?: System.getProperty(systemPropertyName)?.takeIf { it.isNotBlank() }
 
-    private fun getBuildName(): String = resolveBuildInfo("buildInfo.build.name", buildName)
+    private fun getBuildName(): String = getProjectOrSettingsProperty("buildInfo.build.name", buildName)
 
-    private fun getBuildNumber(): String = resolveBuildInfo("buildInfo.build.number", buildNumber)
+    private fun getBuildNumber(): String = getProjectOrSettingsProperty("buildInfo.build.number", buildNumber)
 
-    private fun resolveBuildInfo(
+    private fun getComponentsRegistryServiceUrl(): String = getProjectOrSettingsProperty("component-registry-service-url", componentsRegistryServiceUrl)
+
+    private fun getReleaseManagementServiceUrl(): String = getProjectOrSettingsProperty("release-management-service-url", releaseManagementServiceUrl)
+
+    protected fun getProjectOrSettingsProperty(
         projectPropertyKey: String,
         settingsProvider: Provider<String>
     ): String =
         (project.findProperty(projectPropertyKey) as? String)
             ?.takeIf { it.isNotBlank() }
             ?: settingsProvider.orNull?.takeIf { it.isNotBlank() }
-            ?: throw GradleException("Build info parameter '$projectPropertyKey' is not provided")
+            ?: throw GradleException("Parameter '$projectPropertyKey' is not provided")
 }

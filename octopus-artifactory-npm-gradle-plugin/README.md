@@ -1,14 +1,37 @@
 # octopus-artifactory-npm-gradle-plugin
 A Gradle plugin that integrates NPM dependency build information into an existing Gradle build info published to JFrog Artifactory.
 
-## Available Tasks
-### `integrateNpmBuildInfo`
-1. Collect NPM module information:
-    - Generate a temporary NPM build info using JFrog CLI.
-    - Extract the NPM module data from the NPM build info.
-2. Append the extracted NPM module data to the existing Gradle build info.
-3. Publish the updated Gradle build info to Artifactory.
-4. Clean up temporary NPM build info.
+## How It Works
+### NPM Modules Collection
+The plugin collects NPM module information in two ways:
+#### From `package.json` (if present):
+If the project contains a package.json file (either in the project root or at a configured packageJsonPath), the plugin will:
+1. Generate a temporary NPM build info using JFrog CLI.
+2. Extract the NPM module data from the generated build info.
+3. Mark this data for inclusion in the final Gradle build info.
+#### From Dependency Graph:
+For all cases, the plugin will:
+1. Read the dependencies.json file (specified on dependenciesFilePath setting or project property)
+   - Contains a list of direct dependencies and their versions (name and version).
+   - If `dependenciesFilePath` is not specified or the file is not found, the plugin will skip resolving NPM build info from dependencies.
+   - Example of dependencies.json:
+      ```json
+      [
+         {"name": "dependency-ee", "version": "1.0.0"},
+         {"name": "dependency-ei", "version": "1.0.0"}
+      ]
+      ```
+2. Resolve all transitive dependencies using the Release Management Service.
+3. For each resolved dependency:
+   - Retrieve its build info from Artifactory. 
+   - Check whether the build info contains modules of type npm. 
+   - Extract those NPM modules if present.
+
+### NPM Modules Integration into Gradle Build Info
+After collecting the NPM module information, the plugin will:
+1. Append the extracted NPM module data to the existing Gradle build info.
+2. Publish the updated Gradle build info to Artifactory.
+3. Clean up temporary NPM build info.
 
 **Automatic Execution:**
 - Automatically triggered after build finishes successfully
@@ -40,13 +63,22 @@ pluginManagement {
 
 ### Required System Properties
 
-Artifactory credentials and connection details must be provided as system properties:
+Artifactory credentials and connection details must be provided as **environment variable** or **system properties**:
+- `ARTIFACTORY_URL` or `artifactory.url` - Base URL of the Artifactory instance
+- `ARTIFACTORY_DEPLOYER_USERNAME` or `artifactory.username` - Username for Artifactory authentication
+- `ARTIFACTORY_DEPLOYER_PASSWORD` or `artifactory.password` - Password for Artifactory authentication
+- `ARTIFACTORY_ACCESS_TOKEN` or `artifactory.accessToken` - Access token for Artifactory authentication (alternative to username/password)
 
 ### Required Project Properties
 
 The plugin automatically triggers **only if** these project properties are specified:
 - `buildInfo.build.name` - Gradle build info name to append
 - `buildInfo.build.number` - Gradle build info number to append
+
+Other required properties to be set (if dependencies resolution from dependencies.json is needed):
+- `dependenciesFilePath` - Path to the dependencies.json file containing direct NPM dependencies
+- `component-registry-service-url` - URL of the Component Registry Service (CRS) to fetch component information of NPM dependencies
+- `release-management-service-url` - URL of the Release Management Service (RMS) to fetch dependencies information for NPM dependencies
 
 ### Optional Configurations
 

@@ -18,8 +18,12 @@ abstract class BaseFunctionalTest {
     protected val artifactoryHost: String = System.getProperty("artifactoryTestHost")
     protected val artifactoryUrl = "http://$artifactoryHost"
 
+    protected val componentsRegistryServiceUrl: String? = System.getProperty("componentsRegistryServiceUrl")
+    protected val releaseManagementServiceUrl: String? = System.getProperty("releaseManagementServiceUrl")
+
     abstract val defaultTasks: List<String>
     abstract val artifactoryProperties: List<String>
+    abstract val serviceProperties: List<String>
 
     protected val artifactoryClient = ArtifactoryClassicClient(object : ClientParametersProvider {
         override fun getApiUrl() = artifactoryUrl

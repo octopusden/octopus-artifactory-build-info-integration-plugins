@@ -9,10 +9,12 @@ import org.apache.maven.plugins.annotations.ResolutionScope
 import org.apache.maven.project.MavenProject
 import org.octopusden.octopus.artifactory.build.info.integration.configuration.ArtifactoryConfiguration
 import org.octopusden.octopus.artifactory.build.info.integration.configuration.BuildInfoConfiguration
+import org.octopusden.octopus.artifactory.build.info.integration.configuration.ServiceConfiguration
 import org.octopusden.octopus.artifactory.build.info.integration.exception.CoreException
 import org.octopusden.octopus.artifactory.build.info.integration.service.NpmBuildInfoIntegrationService
 import org.octopusden.octopus.artifactory.build.info.integration.service.impl.ArtifactoryBuildInfoServiceImpl
 import org.octopusden.octopus.artifactory.build.info.integration.service.impl.CommandExecutorServiceImpl
+import org.octopusden.octopus.artifactory.build.info.integration.service.impl.DependenciesBuildInfoResolverImpl
 import org.octopusden.octopus.artifactory.build.info.integration.service.impl.JFrogNpmCliServiceImpl
 import org.octopusden.octopus.artifactory.build.info.integration.service.impl.NpmBuildInfoIntegrationServiceImpl
 import org.octopusden.octopus.artifactory.npm.maven.plugin.exception.ParameterValidationException
@@ -74,6 +76,12 @@ class ArtifactoryNpmMavenPluginMojo : AbstractMojo() {
     @Parameter(property = "artifactory.npm.skip.wait.for.xray.scan", defaultValue = "false")
     private var skipWaitForXrayScan: Boolean = false
 
+    @Parameter(property = "registry.url", defaultValue = "")
+    private var componentsRegistryServiceUrl: String = ""
+
+    @Parameter(property = "release.management.url", defaultValue = "")
+    private var releaseManagementServiceUrl: String = ""
+
     private lateinit var integrationService: NpmBuildInfoIntegrationService
 
     override fun execute() {
@@ -104,7 +112,7 @@ class ArtifactoryNpmMavenPluginMojo : AbstractMojo() {
 
             val originalListener = session.request.executionListener
             session.request.executionListener = ArtifactoryNpmBuildInfoListener(originalListener) {
-                integrationService.integrateNpmBuildInfo(buildInfoConfiguration, skipWaitForXrayScan)
+                integrationService.integrateNpmBuildInfo(buildInfoConfiguration, listOf(), false, skipWaitForXrayScan)
             }
             
         } catch (e: CoreException) {
@@ -130,7 +138,9 @@ class ArtifactoryNpmMavenPluginMojo : AbstractMojo() {
         val jfrogCliService = JFrogNpmCliServiceImpl(commandExecutor)
         val buildInfoService = ArtifactoryBuildInfoServiceImpl(createArtifactoryClient())
 
-        integrationService = NpmBuildInfoIntegrationServiceImpl(jfrogCliService, buildInfoService)
+        integrationService = NpmBuildInfoIntegrationServiceImpl(jfrogCliService, buildInfoService) {
+            DependenciesBuildInfoResolverImpl(ServiceConfiguration(componentsRegistryServiceUrl, releaseManagementServiceUrl))
+        }
     }
 
     private fun createArtifactoryClient(): ArtifactoryClient {

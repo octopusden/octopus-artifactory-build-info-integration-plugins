@@ -8,6 +8,7 @@ dependencies {
     implementation(project(":build-info-integration-core"))
     implementation("org.octopusden.octopus.octopus-external-systems-clients:artifactory-client:${property("octopus-artifactory-client.version")}")
     implementation("org.jetbrains.kotlin:kotlin-stdlib:${property("kotlin.version")}")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:${property("jackson.version")}")
 
     testImplementation(platform("org.junit:junit-bom:${property("junit.version")}"))
     testImplementation("org.junit.jupiter:junit-jupiter")
