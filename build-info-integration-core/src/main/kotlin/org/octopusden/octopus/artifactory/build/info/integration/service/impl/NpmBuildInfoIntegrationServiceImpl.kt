@@ -72,7 +72,7 @@ class NpmBuildInfoIntegrationServiceImpl(
 
         buildInfoService.uploadBuildInfo(mergedBuildInfo)
 
-        if (buildInfoConfig.cleanupNpmBuildInfo) {
+        if (buildInfoConfig.cleanupNpmBuildInfo && npmBuildInfo != null) {
             buildInfoService.deleteBuildInfo(buildInfoConfig.npmBuildName, listOf(buildInfoConfig.buildNumber))
         }
 
