@@ -89,7 +89,10 @@ abstract class IntegrateNpmBuildInfoTask : BaseNpmBuildInfoTask() {
             logger.info("dependenciesFilePath property is not set, skipping dependencies resolution")
             return null
         }
-        val dependenciesFile = File(project.projectDir, filePath)
+        val dependenciesFile = File(filePath).let { file ->
+            if (file.isAbsolute) file
+            else File(project.projectDir, filePath)
+        }
         if (!dependenciesFile.exists() || !dependenciesFile.isFile) {
             logger.warn("Dependencies file does not exist or is not a file: ${dependenciesFile.absolutePath}, skipping dependencies resolution")
             return null

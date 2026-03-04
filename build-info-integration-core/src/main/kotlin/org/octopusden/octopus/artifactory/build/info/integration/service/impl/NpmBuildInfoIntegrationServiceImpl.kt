@@ -72,7 +72,7 @@ class NpmBuildInfoIntegrationServiceImpl(
 
         buildInfoService.uploadBuildInfo(mergedBuildInfo)
 
-        if (buildInfoConfig.cleanupNpmBuildInfo) {
+        if (buildInfoConfig.cleanupNpmBuildInfo && npmBuildInfo != null) {
             buildInfoService.deleteBuildInfo(buildInfoConfig.npmBuildName, listOf(buildInfoConfig.buildNumber))
         }
 
@@ -80,7 +80,7 @@ class NpmBuildInfoIntegrationServiceImpl(
     }
 
     companion object {
-        private const val XRAY_INDEXING_WAIT_MINUTES = 1L
+        private const val XRAY_INDEXING_WAIT_MINUTES = 2L
     }
 
 }
