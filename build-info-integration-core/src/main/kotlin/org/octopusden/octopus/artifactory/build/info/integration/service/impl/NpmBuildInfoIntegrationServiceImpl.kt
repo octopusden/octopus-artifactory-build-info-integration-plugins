@@ -80,7 +80,7 @@ class NpmBuildInfoIntegrationServiceImpl(
     }
 
     companion object {
-        private const val XRAY_INDEXING_WAIT_MINUTES = 1L
+        private const val XRAY_INDEXING_WAIT_MINUTES = 2L
     }
 
 }
