@@ -10,7 +10,6 @@ import org.octopusden.octopus.artifactory.build.info.integration.dto.DependencyV
 import java.io.File
 
 abstract class IntegrateNpmBuildInfoTask : BaseNpmBuildInfoTask() {
-
     @get:Input
     abstract val packageJsonPath: Property<String>
 
@@ -37,16 +36,20 @@ abstract class IntegrateNpmBuildInfoTask : BaseNpmBuildInfoTask() {
             val buildInfoConfiguration = createBuildInfoConfiguration()
             val artifactoryConfiguration = createArtifactoryConfiguration()
 
-
             if (packageJsonDir != null) {
                 integrationService.generateNpmBuildInfo(
                     packageJsonDir.absolutePath,
                     buildInfoConfiguration,
-                    artifactoryConfiguration
+                    artifactoryConfiguration,
                 )
             }
 
-            integrationService.integrateNpmBuildInfo(buildInfoConfiguration, dependencies, packageJsonDir == null, skipWaitForXrayScan.get())
+            integrationService.integrateNpmBuildInfo(
+                buildInfoConfiguration,
+                dependencies,
+                packageJsonDir == null,
+                skipWaitForXrayScan.get(),
+            )
             logger.lifecycle("NPM build info integrated successfully")
         } catch (e: Exception) {
             logger.error("Failed to integrate NPM build info: ${e.message}", e)
@@ -75,7 +78,6 @@ abstract class IntegrateNpmBuildInfoTask : BaseNpmBuildInfoTask() {
         return dir
     }
 
-
     private fun resolveDependencies(): List<DependencyVersion> {
         val dependenciesFile = getDependenciesFile() ?: return emptyList()
         val mapper = jacksonObjectMapper()
@@ -90,14 +92,18 @@ abstract class IntegrateNpmBuildInfoTask : BaseNpmBuildInfoTask() {
             return null
         }
         val dependenciesFile = File(filePath).let { file ->
-            if (file.isAbsolute) file
-            else File(project.projectDir, filePath)
+            if (file.isAbsolute) {
+                file
+            } else {
+                File(project.projectDir, filePath)
+            }
         }
         if (!dependenciesFile.exists() || !dependenciesFile.isFile) {
-            logger.warn("Dependencies file does not exist or is not a file: ${dependenciesFile.absolutePath}, skipping dependencies resolution")
+            logger.warn(
+                "Dependencies file does not exist or is not a file: ${dependenciesFile.absolutePath}, skipping dependencies resolution",
+            )
             return null
         }
         return dependenciesFile
     }
-
 }

@@ -30,10 +30,9 @@ import java.io.File
 
 @Mojo(
     name = "integrate-npm-build-info",
-    requiresDependencyResolution = ResolutionScope.RUNTIME
+    requiresDependencyResolution = ResolutionScope.RUNTIME,
 )
 class ArtifactoryNpmMavenPluginMojo : AbstractMojo() {
-
     @Parameter(defaultValue = "\${project}", readonly = true, required = true)
     private lateinit var project: MavenProject
 
@@ -96,25 +95,29 @@ class ArtifactoryNpmMavenPluginMojo : AbstractMojo() {
             validateParameters()
             initializeServices()
             val buildInfoConfiguration = BuildInfoConfiguration(
-                buildName, buildNumber,
-                npmBuildNameSuffix, npmRepository,
-                cleanupNpmBuildInfo
+                buildName,
+                buildNumber,
+                npmBuildNameSuffix,
+                npmRepository,
+                cleanupNpmBuildInfo,
             )
             val artifactoryConfiguration = ArtifactoryConfiguration(
-                artifactoryUrl, artifactoryUsername,
-                artifactoryPassword, artifactoryAccessToken
+                artifactoryUrl,
+                artifactoryUsername,
+                artifactoryPassword,
+                artifactoryAccessToken,
             )
 
             integrationService.generateNpmBuildInfo(
                 File(project.basedir, packageJsonPath).absolutePath,
-                buildInfoConfiguration, artifactoryConfiguration
+                buildInfoConfiguration,
+                artifactoryConfiguration,
             )
 
             val originalListener = session.request.executionListener
             session.request.executionListener = ArtifactoryNpmBuildInfoListener(originalListener) {
                 integrationService.integrateNpmBuildInfo(buildInfoConfiguration, listOf(), false, skipWaitForXrayScan)
             }
-            
         } catch (e: CoreException) {
             val errorMessage = "NPM build info integration failed: ${e.message}"
             log.error(errorMessage, e)
@@ -154,12 +157,13 @@ class ArtifactoryNpmMavenPluginMojo : AbstractMojo() {
             else ->
                 throw ParameterValidationException(
                     "Artifactory credentials are not properly configured. " +
-                            "Please set `artifactoryAccessToken` or both `artifactoryUsername` and `artifactoryPassword`."
+                        "Please set `artifactoryAccessToken` or both `artifactoryUsername` and `artifactoryPassword`.",
                 )
         }
 
         return ArtifactoryClassicClient(object : ClientParametersProvider {
             override fun getApiUrl(): String = artifactoryUrl
+
             override fun getAuth(): CredentialProvider = credentialProvider
         })
     }

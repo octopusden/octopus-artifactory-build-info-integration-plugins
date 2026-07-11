@@ -6,14 +6,14 @@ import org.octopusden.octopus.artifactory.npm.gradle.plugin.tasks.IntegrateNpmBu
 
 class ArtifactoryNpmTaskConfiguration(
     private val project: Project,
-    private val settings: ArtifactoryNpmSettings
+    private val settings: ArtifactoryNpmSettings,
 ) {
     private var integrationTask: TaskProvider<IntegrateNpmBuildInfoTask>? = null
 
     fun registerTasks() {
         integrationTask = project.tasks.register(
             "integrateNpmBuildInfo",
-            IntegrateNpmBuildInfoTask::class.java
+            IntegrateNpmBuildInfoTask::class.java,
         ) { task ->
             task.group = "artifactory"
             task.description = "Integrates NPM dependencies into Artifactory build info"

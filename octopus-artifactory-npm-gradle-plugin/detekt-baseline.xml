@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>TooGenericExceptionCaught:ArtifactoryNpmTaskConfiguration.kt$ArtifactoryNpmTaskConfiguration$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:IntegrateNpmBuildInfoTask.kt$IntegrateNpmBuildInfoTask$e: Exception</ID>
+    <ID>TooManyFunctions:BaseNpmBuildInfoTask.kt$BaseNpmBuildInfoTask : DefaultTask</ID>
+  </CurrentIssues>
+</SmellBaseline>

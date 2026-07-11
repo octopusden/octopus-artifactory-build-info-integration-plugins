@@ -8,7 +8,7 @@ class ArtifactoryNpmGradlePlugin : Plugin<Project> {
         val extension = project.extensions.create(
             "artifactoryNpm",
             ArtifactoryNpmExtension::class.java,
-            project
+            project,
         )
         project.afterEvaluate {
             extension.taskConfiguration.registerTasks()

@@ -1,20 +1,19 @@
 package org.octopusden.octopus.artifactory.integration.plugins.ft
 
 import com.platformlib.process.api.ProcessInstance
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
 import org.octopusden.octopus.artifactory.integration.plugins.ft.runner.gradleProcessInstance
 import org.octopusden.octopus.infrastructure.artifactory.client.dto.Module
 
-class GradleFunctionalTest: BaseFunctionalTest() {
-
+class GradleFunctionalTest : BaseFunctionalTest() {
     override val defaultTasks = listOf("clean", "build", "publish", "--info", "--stacktrace")
     override val artifactoryProperties = listOf(
         "-Dartifactory.url=$artifactoryUrl",
         "-Dartifactory.repoKey=$ARTIFACTORY_REPO_KEY",
         "-Dartifactory.username=$ARTIFACTORY_USERNAME",
-        "-Dartifactory.password=$ARTIFACTORY_PASSWORD"
+        "-Dartifactory.password=$ARTIFACTORY_PASSWORD",
     )
 
     override val serviceProperties = listOf(
@@ -35,7 +34,7 @@ class GradleFunctionalTest: BaseFunctionalTest() {
             additionalArguments = artifactoryProperties + listOf(
                 "-Pversion=$buildNumber",
                 "-PbuildInfo.build.name=$buildName",
-                "-PbuildInfo.build.number=$buildNumber"
+                "-PbuildInfo.build.number=$buildNumber",
             )
         }
 
@@ -67,7 +66,7 @@ class GradleFunctionalTest: BaseFunctionalTest() {
             testProjectName = "gradle-projects/simple-project"
             tasks = defaultTasks
             additionalArguments = artifactoryProperties + listOf(
-                "-Pversion=$buildNumber"
+                "-Pversion=$buildNumber",
             )
         }
 
@@ -88,7 +87,7 @@ class GradleFunctionalTest: BaseFunctionalTest() {
                 "-Pversion=$buildNumber",
                 "-PbuildInfo.build.name=$buildName",
                 "-PbuildInfo.build.number=$buildNumber",
-                "-Dartifactory.url=$artifactoryUrl"
+                "-Dartifactory.url=$artifactoryUrl",
             )
         }
 
@@ -112,7 +111,12 @@ class GradleFunctionalTest: BaseFunctionalTest() {
             )
         }
 
-        assertFailedOperations(instance, "No package.json found and no dependencies resolved, skipping NPM build info integration", buildName, buildNumber)
+        assertFailedOperations(
+            instance,
+            "No package.json found and no dependencies resolved, skipping NPM build info integration",
+            buildName,
+            buildNumber,
+        )
     }
 
     @Test
@@ -129,7 +133,7 @@ class GradleFunctionalTest: BaseFunctionalTest() {
                 "-Pversion=$buildNumber",
                 "-PbuildInfo.build.name=$buildName",
                 "-PbuildInfo.build.number=$buildNumber",
-                "-PpackageJsonPath=nonexistent/path"
+                "-PpackageJsonPath=nonexistent/path",
             )
         }
 
@@ -176,7 +180,7 @@ class GradleFunctionalTest: BaseFunctionalTest() {
             additionalArguments = artifactoryProperties + serviceProperties + listOf(
                 "-Pversion=$buildNumber",
                 "-PbuildInfo.build.name=$eeBuildName",
-                "-PbuildInfo.build.number=$buildNumber"
+                "-PbuildInfo.build.number=$buildNumber",
             )
         }
         assertEquals(0, eeInstance.exitCode)
@@ -194,7 +198,7 @@ class GradleFunctionalTest: BaseFunctionalTest() {
                 "-Pversion=$buildNumber",
                 "-PbuildInfo.build.name=$eiBuildName",
                 "-PbuildInfo.build.number=$buildNumber",
-                "-PdependenciesFilePath=dependencies.json"
+                "-PdependenciesFilePath=dependencies.json",
             )
         }
         assertEquals(0, eiInstance.exitCode)
@@ -229,7 +233,7 @@ class GradleFunctionalTest: BaseFunctionalTest() {
                 "-Pversion=$buildNumber",
                 "-PbuildInfo.build.name=$buildName",
                 "-PbuildInfo.build.number=$buildNumber",
-                "-PdependenciesFilePath=dependencies.json"
+                "-PdependenciesFilePath=dependencies.json",
             )
         }
         assertEquals(0, instance.exitCode)
@@ -241,7 +245,12 @@ class GradleFunctionalTest: BaseFunctionalTest() {
         assertModule(eiModules.find { it.id == modules[2].id }!!, modules[2])
     }
 
-    override fun assertFailedOperations(instance: ProcessInstance, errorMessage: String, buildName: String, buildNumber: String) {
+    override fun assertFailedOperations(
+        instance: ProcessInstance,
+        errorMessage: String,
+        buildName: String,
+        buildNumber: String,
+    ) {
         assertEquals(0, instance.exitCode)
         assertTrue(instance.stdErr.any { it.contains(errorMessage) } || instance.stdOut.any { it.contains(errorMessage) })
 
@@ -257,7 +266,10 @@ class GradleFunctionalTest: BaseFunctionalTest() {
         assertTrue(moduleList[0].dependencies!!.isNotEmpty())
     }
 
-    private fun assertModule(expected: Module, actual: Module) {
+    private fun assertModule(
+        expected: Module,
+        actual: Module,
+    ) {
         assertEquals(expected.id, actual.id)
         assertEquals(expected.type, actual.type)
         assertEquals(expected.artifacts?.size ?: 0, actual.artifacts?.size ?: 0)
@@ -268,5 +280,4 @@ class GradleFunctionalTest: BaseFunctionalTest() {
             assertEquals(expectedDependency.id, actualDependency!!.id)
         }
     }
-
 }

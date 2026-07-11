@@ -4,5 +4,5 @@ import org.apache.maven.plugin.MojoFailureException
 
 sealed class PluginException(
     message: String,
-    cause: Throwable? = null
+    cause: Throwable? = null,
 ) : MojoFailureException(message, cause)

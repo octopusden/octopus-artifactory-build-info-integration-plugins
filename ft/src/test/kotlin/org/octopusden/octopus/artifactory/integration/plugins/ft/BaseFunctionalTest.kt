@@ -8,7 +8,6 @@ import org.octopusden.octopus.infrastructure.client.commons.ClientParametersProv
 import org.octopusden.octopus.infrastructure.client.commons.StandardBasicCredCredentialProvider
 
 abstract class BaseFunctionalTest {
-
     companion object {
         const val ARTIFACTORY_USERNAME = "admin"
         const val ARTIFACTORY_PASSWORD = "password"
@@ -27,17 +26,27 @@ abstract class BaseFunctionalTest {
 
     protected val artifactoryClient = ArtifactoryClassicClient(object : ClientParametersProvider {
         override fun getApiUrl() = artifactoryUrl
-        override fun getAuth() = StandardBasicCredCredentialProvider(
-            username = ARTIFACTORY_USERNAME,
-            password = ARTIFACTORY_PASSWORD
-        )
+
+        override fun getAuth() =
+            StandardBasicCredCredentialProvider(
+                username = ARTIFACTORY_USERNAME,
+                password = ARTIFACTORY_PASSWORD,
+            )
     })
 
-    protected fun assertBuildInfoNotFound(buildName: String, buildNumber: String) {
+    protected fun assertBuildInfoNotFound(
+        buildName: String,
+        buildNumber: String,
+    ) {
         assertThrows<NotFoundException> {
             artifactoryClient.getBuildInfo(buildName, buildNumber)
         }
     }
 
-    abstract fun assertFailedOperations(instance: ProcessInstance, errorMessage: String, buildName: String, buildNumber: String)
+    abstract fun assertFailedOperations(
+        instance: ProcessInstance,
+        errorMessage: String,
+        buildName: String,
+        buildNumber: String,
+    )
 }

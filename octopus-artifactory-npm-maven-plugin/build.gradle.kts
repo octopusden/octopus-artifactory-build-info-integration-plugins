@@ -16,20 +16,36 @@ dependencies {
 tasks.register<Exec>("generatePluginDescriptor") {
     dependsOn(tasks.named("compileKotlin"))
 
-    val pomFile = layout.buildDirectory.file("pom.xml").get().asFile
-    val pluginDescriptorFile = layout.buildDirectory.file("classes/kotlin/main/META-INF/maven/plugin.xml").get().asFile
-    val pluginHelpDescriptorFile = layout.buildDirectory.file("classes/kotlin/main/META-INF/maven/${project.group}/${project.name}/plugin-help.xml").get().asFile
+    val pomFile = layout.buildDirectory
+        .file("pom.xml")
+        .get()
+        .asFile
+    val pluginDescriptorFile = layout.buildDirectory
+        .file("classes/kotlin/main/META-INF/maven/plugin.xml")
+        .get()
+        .asFile
+    val pluginHelpDescriptorFile = layout.buildDirectory
+        .file(
+            "classes/kotlin/main/META-INF/maven/${project.group}/${project.name}/plugin-help.xml",
+        ).get()
+        .asFile
 
-    val directory = layout.buildDirectory.asFile.get().canonicalPath
-    val outputDirectory = layout.buildDirectory.file("classes/kotlin/main").get().asFile.canonicalPath
+    val directory = layout.buildDirectory.asFile
+        .get()
+        .canonicalPath
+    val outputDirectory = layout.buildDirectory
+        .file("classes/kotlin/main")
+        .get()
+        .asFile.canonicalPath
     val mavenPluginToolsVersion = project.property("maven-plugin-tools.version")
 
     commandLine(
         "mvn",
         "-B",
-        "-f", pomFile.canonicalPath,
+        "-f",
+        pomFile.canonicalPath,
         "-e",
-        "org.apache.maven.plugins:maven-plugin-plugin:${mavenPluginToolsVersion}:descriptor"
+        "org.apache.maven.plugins:maven-plugin-plugin:$mavenPluginToolsVersion:descriptor",
     )
 
     doFirst {
@@ -38,26 +54,27 @@ tasks.register<Exec>("generatePluginDescriptor") {
             buildDir.mkdirs()
         }
 
-        val pomContent = """
+        val pomContent =
+            """
             <project xmlns="http://maven.apache.org/POM/4.0.0"
                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                      xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
                                          http://maven.apache.org/xsd/maven-4.0.0.xsd">
                 <modelVersion>4.0.0</modelVersion>
-    
+            
                 <groupId>${project.group}</groupId>
                 <artifactId>${project.name}</artifactId>
                 <version>${project.version}</version>
                 <description>${project.description}</description>
                 <packaging>maven-plugin</packaging>
-    
+            
                 <build>
                     <directory>$directory</directory>
                     <sourceDirectory>${project.projectDir}/src/main/kotlin</sourceDirectory>
                     <outputDirectory>$outputDirectory</outputDirectory>
                 </build>
             </project>
-        """.trimIndent()
+            """.trimIndent()
 
         pomFile.writeText(pomContent)
 
@@ -68,7 +85,7 @@ tasks.register<Exec>("generatePluginDescriptor") {
     doLast {
         listOf(
             "Plugin descriptor" to pluginDescriptorFile,
-            "Plugin help descriptor" to pluginHelpDescriptorFile
+            "Plugin help descriptor" to pluginHelpDescriptorFile,
         ).forEach { (name, file) ->
             check(file.isFile) {
                 "${file.canonicalPath}: $name was not generated"
@@ -89,7 +106,9 @@ publishing {
 
             pom {
                 name.set("Artifactory NPM Maven Plugin")
-                description.set("Maven plugin that uploads NPM dependencies within a Maven project and includes them in the same build info")
+                description.set(
+                    "Maven plugin that uploads NPM dependencies within a Maven project and includes them in the same build info",
+                )
                 url.set("https://github.com/octopusden/octopus-artifactory-build-info-integration-plugins")
                 inceptionYear.set("2025")
 
@@ -115,7 +134,6 @@ publishing {
         }
     }
 }
-
 
 signing {
     isRequired = project.ext["signingRequired"] as Boolean

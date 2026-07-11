@@ -5,12 +5,12 @@ import java.nio.file.Path
 enum class BuildTool(
     val commandResolver: (Path) -> String,
     val propertyPrefix: String,
-    val stagingProperty: String
+    val stagingProperty: String,
 ) {
     GRADLE(
         commandResolver = { projectPath -> "$projectPath/gradlew" },
         propertyPrefix = "-P",
-        stagingProperty = "-Puse_dev_repository=plugins"
+        stagingProperty = "-Puse_dev_repository=plugins",
     ),
     MAVEN(
         commandResolver = { _ ->
@@ -19,13 +19,15 @@ enum class BuildTool(
                 ?: "mvn"
         },
         propertyPrefix = "-D",
-        stagingProperty = "-Pstaging"
-    );
+        stagingProperty = "-Pstaging",
+    ),
+    ;
+
     fun buildPluginVersionProperty(version: String): String {
         val pluginName = when (this) {
             GRADLE -> "octopus-artifactory-npm-gradle-plugin"
             MAVEN -> "octopus-artifactory-npm-maven-plugin"
         }
-        return "${propertyPrefix}${pluginName}.version=$version"
+        return "${propertyPrefix}$pluginName.version=$version"
     }
 }
