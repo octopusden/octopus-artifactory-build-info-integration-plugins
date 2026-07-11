@@ -15,3 +15,6 @@ jobs:
     uses: octopusden/octopus-base/.github/workflows/common-java-gradle-quality-gates.yml@v2.3.5
     with:
       java-version: '21'
+      # Exclude the :ft functional tests: they require an OKD/Docker cluster
+      # (ocCreate/configureMockServer) that is unavailable on GitHub-hosted runners.
+      coverage-command: ./gradlew qualityCoverage --no-daemon --stacktrace -x :ft:test
