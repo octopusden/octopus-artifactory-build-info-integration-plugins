@@ -12,16 +12,15 @@ import org.octopusden.octopus.releasemanagementservice.client.impl.ReleaseManage
 import org.slf4j.LoggerFactory
 
 class DependenciesBuildInfoResolverImpl(
-    private val serviceConfiguration: ServiceConfiguration
-): DependenciesBuildInfoResolver {
-
+    private val serviceConfiguration: ServiceConfiguration,
+) : DependenciesBuildInfoResolver {
     private val logger = LoggerFactory.getLogger(DependenciesBuildInfoResolverImpl::class.java)
 
     private val componentsRegistryServiceClient by lazy {
         ClassicComponentsRegistryServiceClient(
             object : ClassicComponentsRegistryServiceClientUrlProvider {
                 override fun getApiUrl() = serviceConfiguration.componentsRegistryServiceUrl
-            }
+            },
         )
     }
 
@@ -29,10 +28,13 @@ class DependenciesBuildInfoResolverImpl(
         ClassicReleaseManagementServiceClient(
             object : ReleaseManagementServiceClientParametersProvider {
                 override fun getApiUrl() = serviceConfiguration.releaseManagementServiceUrl
+
                 override fun getTimeRetryInMillis() = 180000
+
                 override fun getConnectTimeoutInMillis() = 30000
+
                 override fun getReadTimeoutInMillis() = 60000
-            }
+            },
         )
     }
 
@@ -46,7 +48,11 @@ class DependenciesBuildInfoResolverImpl(
         val visited = mutableSetOf<String>() // component:version
         val queue = ArrayDeque<Pair<String, String>>()
 
-        logger.info("Found ${directDependencies.size} direct-dependencies versions: ${directDependencies.joinToString(", ") { "${it.name}:${it.version}" }}")
+        logger.info(
+            "Found ${directDependencies.size} direct-dependencies versions: ${directDependencies.joinToString(
+                ", ",
+            ) { "${it.name}:${it.version}" }}",
+        )
 
         directDependencies.forEach { queue.add(it.name to it.version) }
 
@@ -62,8 +68,8 @@ class DependenciesBuildInfoResolverImpl(
                 result.add(
                     DependencyBuildInfo(
                         buildName = getComponentBuildName(component),
-                        buildNumber = build.version
-                    )
+                        buildNumber = build.version,
+                    ),
                 )
             } catch (e: ReleaseManagementServiceException) {
                 logger.warn("Failed to get build info for $component:$version", e)
@@ -82,7 +88,7 @@ class DependenciesBuildInfoResolverImpl(
             val distribution = componentsRegistryServiceClient.getById(component).distribution
             val explicitFlag = if (distribution?.explicit == true) EXPLICIT_EXTERNAL_FLAG else IMPLICIT_INTERNAL_FLAG
             val externalFlag = if (distribution?.external == true) EXPLICIT_EXTERNAL_FLAG else IMPLICIT_INTERNAL_FLAG
-            "${component}_${explicitFlag}${externalFlag}"
+            "${component}_${explicitFlag}$externalFlag"
         }
 
     companion object {

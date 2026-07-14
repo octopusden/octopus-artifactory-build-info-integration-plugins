@@ -2,40 +2,15 @@
 <SmellBaseline>
   <ManuallySuppressedIssues/>
   <CurrentIssues>
-    <ID>ClassOrdering:CommandExecutorServiceImpl.kt$CommandExecutorServiceImpl$override fun executeCommand(command: List&lt;String&gt;, workingDirectory: String?, environmentVariables: Map&lt;String, String&gt;): CommandResult</ID>
+    <ID>ClassOrdering:CommandExecutorServiceImpl.kt$CommandExecutorServiceImpl$override fun executeCommand( command: List&lt;String&gt;, workingDirectory: String?, environmentVariables: Map&lt;String, String&gt;, ): CommandResult</ID>
     <ID>ClassOrdering:DependenciesBuildInfoResolverImpl.kt$DependenciesBuildInfoResolverImpl$private val buildNameCache = mutableMapOf&lt;String, String&gt;()</ID>
     <ID>ClassOrdering:JFrogNpmCliServiceImpl.kt$JFrogNpmCliServiceImpl$Companion</ID>
     <ID>ForbiddenComment:NpmBuildInfoIntegrationServiceImpl.kt$NpmBuildInfoIntegrationServiceImpl$// TODO: Implement proper check for Xray scan status/availability before uploading merged build info to avoid race conditions</ID>
-    <ID>MaxLineLength:ArtifactoryBuildInfoServiceImpl.kt$ArtifactoryBuildInfoServiceImpl$logger.info("Merging ${npmDependenciesModules.size} NPM dependency modules into Maven build info (${mavenBuildInfo.name}:${mavenBuildInfo.number})")</ID>
-    <ID>MaxLineLength:ArtifactoryBuildInfoServiceImpl.kt$ArtifactoryBuildInfoServiceImpl$logger.info("Merging NPM build info (${npmBuildInfo.name}:${npmBuildInfo.number}) into Maven build info (${mavenBuildInfo.name}:${mavenBuildInfo.number})")</ID>
-    <ID>MaxLineLength:ArtifactoryBuildInfoServiceImpl.kt$ArtifactoryBuildInfoServiceImpl$logger.warn("Build info for dependency build ${dependency.buildName}:${dependency.buildNumber} not found. Skipping: ${e.message}")</ID>
-    <ID>MaxLineLength:ArtifactoryBuildInfoServiceImpl.kt$ArtifactoryBuildInfoServiceImpl$logger.warn("Error retrieving build info for dependency build ${dependency.buildName}:${dependency.buildNumber}. Skipping: ${e.message}", e)</ID>
-    <ID>MaxLineLength:CommandExecutorService.kt$CommandExecutorService$fun executeCommand(command: List&lt;String&gt;, workingDirectory: String? = null, environmentVariables: Map&lt;String, String&gt; = emptyMap()): CommandResult</ID>
-    <ID>MaxLineLength:CommandExecutorServiceImpl.kt$CommandExecutorServiceImpl$override</ID>
-    <ID>MaxLineLength:CommandExecutorServiceImpl.kt$CommandExecutorServiceImpl$private val logger = LoggerFactory.getLogger(org.octopusden.octopus.artifactory.build.info.integration.service.impl.CommandExecutorServiceImpl::class.java)</ID>
-    <ID>MaxLineLength:CommandExecutorServiceImpl.kt$CommandExecutorServiceImpl$val errorMsg = "Command timed out after ${org.octopusden.octopus.artifactory.build.info.integration.service.impl.CommandExecutorServiceImpl.Companion.DEFAULT_TIMEOUT_MINUTES} minutes"</ID>
-    <ID>MaxLineLength:CommandExecutorServiceImpl.kt$CommandExecutorServiceImpl$val finished = process.waitFor(org.octopusden.octopus.artifactory.build.info.integration.service.impl.CommandExecutorServiceImpl.Companion.DEFAULT_TIMEOUT_MINUTES, TimeUnit.MINUTES)</ID>
-    <ID>MaxLineLength:DependenciesBuildInfoResolverImpl.kt$DependenciesBuildInfoResolverImpl$logger.info("Found ${directDependencies.size} direct-dependencies versions: ${directDependencies.joinToString(", ") { "${it.name}:${it.version}" }}")</ID>
-    <ID>MaxLineLength:JFrogNpmCliServiceImpl.kt$JFrogNpmCliServiceImpl$override</ID>
-    <ID>MaxLineLength:NpmBuildInfoIntegrationService.kt$NpmBuildInfoIntegrationService$fun integrateNpmBuildInfo(buildInfoConfig: BuildInfoConfiguration, directDependencies: List&lt;DependencyVersion&gt;, skipDirectNpmDependenciesGeneration: Boolean, skipWaitForXrayScan: Boolean)</ID>
+    <ID>MaxLineLength:ArtifactoryBuildInfoServiceImpl.kt$ArtifactoryBuildInfoServiceImpl$"Build info for dependency build ${dependency.buildName}:${dependency.buildNumber} not found. Skipping: ${e.message}"</ID>
+    <ID>MaxLineLength:ArtifactoryBuildInfoServiceImpl.kt$ArtifactoryBuildInfoServiceImpl$"Error retrieving build info for dependency build ${dependency.buildName}:${dependency.buildNumber}. Skipping: ${e.message}"</ID>
+    <ID>MaxLineLength:ArtifactoryBuildInfoServiceImpl.kt$ArtifactoryBuildInfoServiceImpl$"Merging ${npmDependenciesModules.size} NPM dependency modules into Maven build info (${mavenBuildInfo.name}:${mavenBuildInfo.number})"</ID>
+    <ID>MaxLineLength:ArtifactoryBuildInfoServiceImpl.kt$ArtifactoryBuildInfoServiceImpl$"Merging NPM build info (${npmBuildInfo.name}:${npmBuildInfo.number}) into Maven build info (${mavenBuildInfo.name}:${mavenBuildInfo.number})"</ID>
     <ID>MaxLineLength:NpmBuildInfoIntegrationServiceImpl.kt$NpmBuildInfoIntegrationServiceImpl$"Waiting for $XRAY_INDEXING_WAIT_MINUTES minute(s) before uploading merged build info to prevent Xray indexing race condition"</ID>
-    <ID>MaxLineLength:NpmBuildInfoIntegrationServiceImpl.kt$NpmBuildInfoIntegrationServiceImpl$jfrogNpmCliService.publishNpmBuildInfo(packageJsonPath, buildInfoConfig.npmBuildName, buildInfoConfig.buildNumber, artifactoryConfig)</ID>
-    <ID>NewLineAtEndOfFile:ArtifactoryBuildInfoService.kt$org.octopusden.octopus.artifactory.build.info.integration.service.ArtifactoryBuildInfoService.kt</ID>
-    <ID>NewLineAtEndOfFile:ArtifactoryBuildInfoServiceImpl.kt$org.octopusden.octopus.artifactory.build.info.integration.service.impl.ArtifactoryBuildInfoServiceImpl.kt</ID>
-    <ID>NewLineAtEndOfFile:ArtifactoryConfiguration.kt$org.octopusden.octopus.artifactory.build.info.integration.configuration.ArtifactoryConfiguration.kt</ID>
-    <ID>NewLineAtEndOfFile:ArtifactoryException.kt$org.octopusden.octopus.artifactory.build.info.integration.exception.ArtifactoryException.kt</ID>
-    <ID>NewLineAtEndOfFile:BuildInfoConfiguration.kt$org.octopusden.octopus.artifactory.build.info.integration.configuration.BuildInfoConfiguration.kt</ID>
-    <ID>NewLineAtEndOfFile:CommandExecutorService.kt$org.octopusden.octopus.artifactory.build.info.integration.service.CommandExecutorService.kt</ID>
-    <ID>NewLineAtEndOfFile:CommandExecutorServiceImpl.kt$org.octopusden.octopus.artifactory.build.info.integration.service.impl.CommandExecutorServiceImpl.kt</ID>
-    <ID>NewLineAtEndOfFile:ConfigurationException.kt$org.octopusden.octopus.artifactory.build.info.integration.exception.ConfigurationException.kt</ID>
-    <ID>NewLineAtEndOfFile:CoreException.kt$org.octopusden.octopus.artifactory.build.info.integration.exception.CoreException.kt</ID>
-    <ID>NewLineAtEndOfFile:DependenciesBuildInfoResolver.kt$org.octopusden.octopus.artifactory.build.info.integration.service.DependenciesBuildInfoResolver.kt</ID>
-    <ID>NewLineAtEndOfFile:DependenciesBuildInfoResolverImpl.kt$org.octopusden.octopus.artifactory.build.info.integration.service.impl.DependenciesBuildInfoResolverImpl.kt</ID>
-    <ID>NewLineAtEndOfFile:JFrogCliException.kt$org.octopusden.octopus.artifactory.build.info.integration.exception.JFrogCliException.kt</ID>
-    <ID>NewLineAtEndOfFile:JFrogNpmCliService.kt$org.octopusden.octopus.artifactory.build.info.integration.service.JFrogNpmCliService.kt</ID>
-    <ID>NewLineAtEndOfFile:JFrogNpmCliServiceImpl.kt$org.octopusden.octopus.artifactory.build.info.integration.service.impl.JFrogNpmCliServiceImpl.kt</ID>
-    <ID>NewLineAtEndOfFile:NpmBuildInfoIntegrationService.kt$org.octopusden.octopus.artifactory.build.info.integration.service.NpmBuildInfoIntegrationService.kt</ID>
-    <ID>NewLineAtEndOfFile:NpmBuildInfoIntegrationServiceImpl.kt$org.octopusden.octopus.artifactory.build.info.integration.service.impl.NpmBuildInfoIntegrationServiceImpl.kt</ID>
     <ID>TooGenericExceptionCaught:CommandExecutorServiceImpl.kt$CommandExecutorServiceImpl$e: Exception</ID>
     <ID>TooGenericExceptionCaught:CommandExecutorServiceImpl.kt$CommandExecutorServiceImpl$e: RuntimeException</ID>
     <ID>TooGenericExceptionCaught:DependenciesBuildInfoResolverImpl.kt$DependenciesBuildInfoResolverImpl$e: Exception</ID>

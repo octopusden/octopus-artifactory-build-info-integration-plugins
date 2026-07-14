@@ -5,6 +5,16 @@ import org.octopusden.octopus.artifactory.build.info.integration.configuration.B
 import org.octopusden.octopus.artifactory.build.info.integration.dto.DependencyVersion
 
 interface NpmBuildInfoIntegrationService {
-    fun generateNpmBuildInfo(packageJsonPath: String, buildInfoConfig: BuildInfoConfiguration, artifactoryConfig: ArtifactoryConfiguration)
-    fun integrateNpmBuildInfo(buildInfoConfig: BuildInfoConfiguration, directDependencies: List<DependencyVersion>, skipDirectNpmDependenciesGeneration: Boolean, skipWaitForXrayScan: Boolean)
+    fun generateNpmBuildInfo(
+        packageJsonPath: String,
+        buildInfoConfig: BuildInfoConfiguration,
+        artifactoryConfig: ArtifactoryConfiguration,
+    )
+
+    fun integrateNpmBuildInfo(
+        buildInfoConfig: BuildInfoConfiguration,
+        directDependencies: List<DependencyVersion>,
+        skipDirectNpmDependenciesGeneration: Boolean,
+        skipWaitForXrayScan: Boolean,
+    )
 }

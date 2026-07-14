@@ -7,18 +7,23 @@ import java.io.File
 import java.util.concurrent.TimeUnit
 
 class CommandExecutorServiceImpl : CommandExecutorService {
-    
-    private val logger = LoggerFactory.getLogger(org.octopusden.octopus.artifactory.build.info.integration.service.impl.CommandExecutorServiceImpl::class.java)
-    
+    private val logger = LoggerFactory.getLogger(
+        org.octopusden.octopus.artifactory.build.info.integration.service.impl.CommandExecutorServiceImpl::class.java,
+    )
+
     companion object {
         private const val DEFAULT_TIMEOUT_MINUTES = 10L
     }
 
-    override fun executeCommand(command: List<String>, workingDirectory: String?, environmentVariables: Map<String, String>): CommandResult {
+    override fun executeCommand(
+        command: List<String>,
+        workingDirectory: String?,
+        environmentVariables: Map<String, String>,
+    ): CommandResult {
         try {
             val processBuilder = ProcessBuilder(command)
 
-            workingDirectory?.let { 
+            workingDirectory?.let {
                 processBuilder.directory(File(it))
                 logger.debug("Working directory: $it")
             }
@@ -32,12 +37,12 @@ class CommandExecutorServiceImpl : CommandExecutorService {
             }
 
             processBuilder.redirectErrorStream(false)
-            
+
             val process = processBuilder.start()
 
             val outputBuilder = StringBuilder()
             val errorBuilder = StringBuilder()
-            
+
             val outputThread = Thread {
                 process.inputStream.bufferedReader().use { reader ->
                     reader.lines().forEach { line ->
@@ -46,7 +51,7 @@ class CommandExecutorServiceImpl : CommandExecutorService {
                     }
                 }
             }
-            
+
             val errorThread = Thread {
                 process.errorStream.bufferedReader().use { reader ->
                     reader.lines().forEach { line ->
@@ -55,20 +60,20 @@ class CommandExecutorServiceImpl : CommandExecutorService {
                     }
                 }
             }
-            
+
             outputThread.start()
             errorThread.start()
 
-            val finished = process.waitFor(org.octopusden.octopus.artifactory.build.info.integration.service.impl.CommandExecutorServiceImpl.Companion.DEFAULT_TIMEOUT_MINUTES, TimeUnit.MINUTES)
-            
+            val finished = process.waitFor(DEFAULT_TIMEOUT_MINUTES, TimeUnit.MINUTES)
+
             if (!finished) {
                 process.destroyForcibly()
-                val errorMsg = "Command timed out after ${org.octopusden.octopus.artifactory.build.info.integration.service.impl.CommandExecutorServiceImpl.Companion.DEFAULT_TIMEOUT_MINUTES} minutes"
+                val errorMsg = "Command timed out after $DEFAULT_TIMEOUT_MINUTES minutes"
                 logger.error(errorMsg)
                 return CommandResult(
                     exitCode = -1,
                     output = outputBuilder.toString(),
-                    errorOutput = errorMsg
+                    errorOutput = errorMsg,
                 )
             }
 
@@ -80,11 +85,11 @@ class CommandExecutorServiceImpl : CommandExecutorService {
             if (errorThread.isAlive) {
                 logger.warn("Error thread did not complete within timeout")
             }
-            
+
             val exitCode = process.exitValue()
             val output = outputBuilder.toString().trim()
             val errorOutput = errorBuilder.toString().trim()
-            
+
             logger.debug("Command finished with exit code: $exitCode")
 
             if (exitCode != 0) {
@@ -93,16 +98,15 @@ class CommandExecutorServiceImpl : CommandExecutorService {
                 return CommandResult(
                     exitCode = exitCode,
                     output = outputBuilder.toString(),
-                    errorOutput = errorMsg
+                    errorOutput = errorMsg,
                 )
             }
-            
+
             return CommandResult(
                 exitCode = exitCode,
                 output = output,
-                errorOutput = errorOutput
+                errorOutput = errorOutput,
             )
-
         } catch (e: RuntimeException) {
             throw e
         } catch (e: Exception) {
@@ -110,9 +114,8 @@ class CommandExecutorServiceImpl : CommandExecutorService {
             return CommandResult(
                 exitCode = -1,
                 output = "",
-                errorOutput = "Exception occurred: ${e.message}"
+                errorOutput = "Exception occurred: ${e.message}",
             )
         }
     }
-
 }
