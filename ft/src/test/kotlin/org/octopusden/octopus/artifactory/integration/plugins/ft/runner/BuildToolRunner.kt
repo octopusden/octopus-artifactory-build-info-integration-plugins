@@ -8,20 +8,18 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
-fun gradleProcessInstance(init: BuildToolConfig.() -> Unit): ProcessInstance {
-    return buildToolProcessInstance {
+fun gradleProcessInstance(init: BuildToolConfig.() -> Unit): ProcessInstance =
+    buildToolProcessInstance {
         buildTool = BuildTool.GRADLE
         defaultArguments = listOf("--no-daemon")
         init()
     }
-}
 
-fun mavenProcessInstance(init: BuildToolConfig.() -> Unit): ProcessInstance {
-    return buildToolProcessInstance {
+fun mavenProcessInstance(init: BuildToolConfig.() -> Unit): ProcessInstance =
+    buildToolProcessInstance {
         buildTool = BuildTool.MAVEN
         init()
     }
-}
 
 private fun buildToolProcessInstance(init: BuildToolConfig.() -> Unit): ProcessInstance {
     val config = BuildToolConfig().apply(init)
@@ -29,7 +27,7 @@ private fun buildToolProcessInstance(init: BuildToolConfig.() -> Unit): ProcessI
     val projectPath = getResourcePath("/${config.testProjectName}")
     if (!Files.isDirectory(projectPath)) {
         throw IllegalArgumentException(
-            "The specified project '${config.testProjectName}' hasn't been found at $projectPath"
+            "The specified project '${config.testProjectName}' hasn't been found at $projectPath",
         )
     }
 

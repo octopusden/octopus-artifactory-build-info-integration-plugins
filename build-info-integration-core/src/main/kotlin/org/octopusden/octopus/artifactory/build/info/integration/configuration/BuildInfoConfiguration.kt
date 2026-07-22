@@ -5,8 +5,8 @@ data class BuildInfoConfiguration(
     val buildNumber: String,
     val npmBuildNameSuffix: String,
     val npmRepository: String,
-    val cleanupNpmBuildInfo: Boolean
+    val cleanupNpmBuildInfo: Boolean,
 ) {
     val npmBuildName: String
-        get() = "${buildName}${npmBuildNameSuffix}"
+        get() = "${buildName}$npmBuildNameSuffix"
 }

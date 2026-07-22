@@ -8,6 +8,25 @@ plugins {
     signing
     id("io.github.gradle-nexus.publish-plugin")
     id("com.jfrog.artifactory")
+    // Octopus quality-gates convention plugin (registers qualityStatic/qualityCoverage/qualityCheck).
+    id("org.octopusden.octopus-quality")
+    // Kotlin linters declared here (apply false) so they are on the classpath; applied per
+    // Kotlin subproject below. The convention plugin only *configures* detekt/ktlint — the
+    // consumer must apply them per Kotlin module (otherwise the static gate is hollow).
+    id("io.gitlab.arturbosch.detekt") apply false
+    id("org.jlleitschuh.gradle.ktlint") apply false
+}
+
+octopusQuality {
+    // No JaCoCo/Kover in this repo — keep coverage verification disabled; the static gate
+    // (detekt + ktlint) is what qualityStatic enforces.
+    coverage {
+        enabled.set(false)
+    }
+    // Fail the build on Kotlin linter violations; committed baselines absorb current debt.
+    kotlin {
+        failOnViolation.set(true)
+    }
 }
 
 val defaultVersion = run {
@@ -47,6 +66,10 @@ subprojects {
     apply(plugin = "signing")
     apply(plugin = "idea")
     apply(plugin = "com.jfrog.artifactory")
+    // Kotlin static analysers — every module here is Kotlin; the convention plugin
+    // configures these (shared rules, baselines, reports) once applied.
+    apply(plugin = "io.gitlab.arturbosch.detekt")
+    apply(plugin = "org.jlleitschuh.gradle.ktlint")
 
     artifactory {
         publish {

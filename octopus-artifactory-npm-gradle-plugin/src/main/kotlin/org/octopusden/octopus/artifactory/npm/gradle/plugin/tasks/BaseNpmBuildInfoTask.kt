@@ -24,7 +24,6 @@ import org.octopusden.octopus.infrastructure.client.commons.StandardBasicCredCre
 import org.octopusden.octopus.infrastructure.client.commons.StandardBearerTokenCredentialProvider
 
 abstract class BaseNpmBuildInfoTask : DefaultTask() {
-
     @get:Input
     abstract val buildName: Property<String>
 
@@ -64,24 +63,22 @@ abstract class BaseNpmBuildInfoTask : DefaultTask() {
         }
     }
 
-    protected fun createBuildInfoConfiguration(): BuildInfoConfiguration {
-        return BuildInfoConfiguration(
+    protected fun createBuildInfoConfiguration(): BuildInfoConfiguration =
+        BuildInfoConfiguration(
             getBuildName(),
             getBuildNumber(),
             npmBuildNameSuffix.get(),
             npmRepository.get(),
-            cleanupNpmBuildInfo.get()
+            cleanupNpmBuildInfo.get(),
         )
-    }
 
-    protected fun createArtifactoryConfiguration(): ArtifactoryConfiguration {
-        return ArtifactoryConfiguration(
+    protected fun createArtifactoryConfiguration(): ArtifactoryConfiguration =
+        ArtifactoryConfiguration(
             getArtifactoryUrl(),
             getArtifactoryUsername(),
             getArtifactoryPassword(),
-            getArtifactoryAccessToken()
+            getArtifactoryAccessToken(),
         )
-    }
 
     private fun createArtifactoryClient(): ArtifactoryClient {
         val credentialProvider: CredentialProvider = when {
@@ -94,20 +91,20 @@ abstract class BaseNpmBuildInfoTask : DefaultTask() {
             else ->
                 throw GradleException(
                     "Artifactory credentials are not properly configured. " +
-                            "Please set system property 'artifactory.accessToken' or both 'artifactory.username' and 'artifactory.password'."
+                        "Please set system property 'artifactory.accessToken' or both 'artifactory.username' and 'artifactory.password'.",
                 )
         }
 
         return ArtifactoryClassicClient(object : ClientParametersProvider {
             override fun getApiUrl(): String = getArtifactoryUrl()
+
             override fun getAuth(): CredentialProvider = credentialProvider
         })
     }
 
-    private fun getArtifactoryUrl(): String {
-        return getEnvOrSystemProperty("ARTIFACTORY_URL", "artifactory.url")
+    private fun getArtifactoryUrl(): String =
+        getEnvOrSystemProperty("ARTIFACTORY_URL", "artifactory.url")
             ?: throw GradleException("Environment variable 'ARTIFACTORY_URL' or system property 'artifactory.url' must be provided")
-    }
 
     private fun getArtifactoryAccessToken(): String? = getEnvOrSystemProperty("ARTIFACTORY_ACCESS_TOKEN", "artifactory.accessToken")
 
@@ -115,7 +112,10 @@ abstract class BaseNpmBuildInfoTask : DefaultTask() {
 
     private fun getArtifactoryPassword(): String? = getEnvOrSystemProperty("ARTIFACTORY_DEPLOYER_PASSWORD", "artifactory.password")
 
-    private fun getEnvOrSystemProperty(envVariable: String, systemPropertyName: String): String? =
+    private fun getEnvOrSystemProperty(
+        envVariable: String,
+        systemPropertyName: String,
+    ): String? =
         System.getenv(envVariable)?.takeIf { it.isNotBlank() }
             ?: System.getProperty(systemPropertyName)?.takeIf { it.isNotBlank() }
 
@@ -123,13 +123,15 @@ abstract class BaseNpmBuildInfoTask : DefaultTask() {
 
     private fun getBuildNumber(): String = getProjectOrSettingsProperty("buildInfo.build.number", buildNumber)
 
-    private fun getComponentsRegistryServiceUrl(): String = getProjectOrSettingsProperty("component-registry-service-url", componentsRegistryServiceUrl)
+    private fun getComponentsRegistryServiceUrl(): String =
+        getProjectOrSettingsProperty("component-registry-service-url", componentsRegistryServiceUrl)
 
-    private fun getReleaseManagementServiceUrl(): String = getProjectOrSettingsProperty("release-management-service-url", releaseManagementServiceUrl)
+    private fun getReleaseManagementServiceUrl(): String =
+        getProjectOrSettingsProperty("release-management-service-url", releaseManagementServiceUrl)
 
     protected fun getProjectOrSettingsProperty(
         projectPropertyKey: String,
-        settingsProvider: Provider<String>
+        settingsProvider: Provider<String>,
     ): String =
         (project.findProperty(projectPropertyKey) as? String)
             ?.takeIf { it.isNotBlank() }

@@ -6,14 +6,13 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.octopusden.octopus.artifactory.integration.plugins.ft.runner.mavenProcessInstance
 
-class MavenFunctionalTest: BaseFunctionalTest() {
-
+class MavenFunctionalTest : BaseFunctionalTest() {
     override val defaultTasks = listOf("clean", "install", "deploy", "-X")
     override val artifactoryProperties = listOf(
         "-DartifactoryHost=$artifactoryHost",
         "-DartifactoryRepository=$ARTIFACTORY_REPO_KEY",
         "-DartifactoryUsername=$ARTIFACTORY_USERNAME",
-        "-DartifactoryPassword=$ARTIFACTORY_PASSWORD"
+        "-DartifactoryPassword=$ARTIFACTORY_PASSWORD",
     )
     override val serviceProperties = emptyList<String>()
 
@@ -61,8 +60,7 @@ class MavenFunctionalTest: BaseFunctionalTest() {
             testProjectName = "maven-projects/missing-parameters"
             tasks = defaultTasks
             additionalArguments = artifactoryProperties + listOf(
-                "-Dversion=$buildNumber"
-
+                "-Dversion=$buildNumber",
             )
         }
 
@@ -83,7 +81,7 @@ class MavenFunctionalTest: BaseFunctionalTest() {
                 "-Dversion=$buildNumber",
                 "-Dartifactory.build.name=$buildName",
                 "-Dartifactory.build.version=$buildNumber",
-                "-DartifactoryHost=$artifactoryHost"
+                "-DartifactoryHost=$artifactoryHost",
             )
         }
 
@@ -103,17 +101,21 @@ class MavenFunctionalTest: BaseFunctionalTest() {
             additionalArguments = artifactoryProperties + listOf(
                 "-Dversion=$buildNumber",
                 "-Dartifactory.build.name=$buildName",
-                "-Dartifactory.build.version=$buildNumber"
+                "-Dartifactory.build.version=$buildNumber",
             )
         }
 
         assertFailedOperations(instance, "package.json not found in directory", buildName, buildNumber)
     }
 
-    override fun assertFailedOperations(instance: ProcessInstance, errorMessage: String, buildName: String, buildNumber: String) {
+    override fun assertFailedOperations(
+        instance: ProcessInstance,
+        errorMessage: String,
+        buildName: String,
+        buildNumber: String,
+    ) {
         assertEquals(1, instance.exitCode)
         assertTrue(instance.stdOut.any { Regex(errorMessage).containsMatchIn(it) })
         assertBuildInfoNotFound(buildName, buildNumber)
     }
-
 }

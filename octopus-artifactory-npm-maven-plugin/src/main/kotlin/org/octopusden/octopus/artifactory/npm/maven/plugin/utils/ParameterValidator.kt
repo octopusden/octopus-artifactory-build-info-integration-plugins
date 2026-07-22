@@ -5,7 +5,6 @@ import java.io.File
 import java.net.URI
 
 object ParameterValidator {
-
     private const val ARTIFACTORY_URL_PARAMETER = "artifactoryUrl"
     private const val PACKAGE_JSON_PATH_PARAMETER = "packageJsonPath"
 
@@ -16,7 +15,7 @@ object ParameterValidator {
                 throw ParameterValidationException(
                     "Invalid artifactory URL. Must be a valid URL with scheme and host.",
                     field = ARTIFACTORY_URL_PARAMETER,
-                    value = url
+                    value = url,
                 )
             }
         } catch (e: ParameterValidationException) {
@@ -26,7 +25,7 @@ object ParameterValidator {
                 "Invalid artifactory URL format",
                 field = ARTIFACTORY_URL_PARAMETER,
                 value = url,
-                cause = e
+                cause = e,
             )
         }
     }
@@ -36,12 +35,12 @@ object ParameterValidator {
             !folderPath.exists() -> throw ParameterValidationException(
                 "Directory not found",
                 field = PACKAGE_JSON_PATH_PARAMETER,
-                value = folderPath.absolutePath
+                value = folderPath.absolutePath,
             )
             !folderPath.isDirectory -> throw ParameterValidationException(
                 "Path is not a directory",
                 field = PACKAGE_JSON_PATH_PARAMETER,
-                value = folderPath.absolutePath
+                value = folderPath.absolutePath,
             )
         }
 
@@ -50,7 +49,7 @@ object ParameterValidator {
             throw ParameterValidationException(
                 "package.json not found in directory",
                 field = PACKAGE_JSON_PATH_PARAMETER,
-                value = folderPath.absolutePath
+                value = folderPath.absolutePath,
             )
         }
     }

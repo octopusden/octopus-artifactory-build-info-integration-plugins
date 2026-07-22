@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>ThrowsCount:ParameterValidator.kt$ParameterValidator$fun validateArtifactoryUrl(url: String)</ID>
+    <ID>ThrowsCount:ParameterValidator.kt$ParameterValidator$fun validatePackageJsonPath(folderPath: File)</ID>
+    <ID>TooGenericExceptionCaught:ArtifactoryNpmMavenPluginMojo.kt$ArtifactoryNpmMavenPluginMojo$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:ParameterValidator.kt$ParameterValidator$e: Exception</ID>
+    <ID>TooManyFunctions:ArtifactoryNpmBuildInfoListener.kt$ArtifactoryNpmBuildInfoListener : AbstractExecutionListener</ID>
+  </CurrentIssues>
+</SmellBaseline>

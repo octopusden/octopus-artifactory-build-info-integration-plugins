@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>ClassOrdering:BaseFunctionalTest.kt$BaseFunctionalTest$Companion</ID>
+    <ID>UseRequire:BuildToolRunner.kt$throw IllegalArgumentException( "The specified project '${config.testProjectName}' hasn't been found at $projectPath", )</ID>
+  </CurrentIssues>
+</SmellBaseline>

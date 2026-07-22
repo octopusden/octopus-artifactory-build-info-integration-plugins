@@ -14,9 +14,8 @@ import java.util.concurrent.TimeUnit
 class NpmBuildInfoIntegrationServiceImpl(
     private val jfrogNpmCliService: JFrogNpmCliService,
     private val buildInfoService: ArtifactoryBuildInfoService,
-    private val dependenciesBuildInfoResolverProvider: () -> DependenciesBuildInfoResolver
+    private val dependenciesBuildInfoResolverProvider: () -> DependenciesBuildInfoResolver,
 ) : NpmBuildInfoIntegrationService {
-
     private val logger = LoggerFactory.getLogger(NpmBuildInfoIntegrationServiceImpl::class.java)
 
     private val dependenciesBuildInfoResolver by lazy { dependenciesBuildInfoResolverProvider() }
@@ -24,7 +23,7 @@ class NpmBuildInfoIntegrationServiceImpl(
     override fun generateNpmBuildInfo(
         packageJsonPath: String,
         buildInfoConfig: BuildInfoConfiguration,
-        artifactoryConfig: ArtifactoryConfiguration
+        artifactoryConfig: ArtifactoryConfiguration,
     ) {
         logger.info("Generate NPM build info for build ${buildInfoConfig.buildName}:${buildInfoConfig.buildNumber}")
 
@@ -34,14 +33,19 @@ class NpmBuildInfoIntegrationServiceImpl(
 
         jfrogNpmCliService.configureNpmRepository(packageJsonPath, buildInfoConfig.npmRepository)
         jfrogNpmCliService.installNpmDependencies(packageJsonPath, buildInfoConfig.npmBuildName, buildInfoConfig.buildNumber)
-        jfrogNpmCliService.publishNpmBuildInfo(packageJsonPath, buildInfoConfig.npmBuildName, buildInfoConfig.buildNumber, artifactoryConfig)
+        jfrogNpmCliService.publishNpmBuildInfo(
+            packageJsonPath,
+            buildInfoConfig.npmBuildName,
+            buildInfoConfig.buildNumber,
+            artifactoryConfig,
+        )
     }
 
     override fun integrateNpmBuildInfo(
         buildInfoConfig: BuildInfoConfiguration,
         directDependencies: List<DependencyVersion>,
         skipDirectNpmDependenciesGeneration: Boolean,
-        skipWaitForXrayScan: Boolean
+        skipWaitForXrayScan: Boolean,
     ) {
         logger.info("Integrate NPM build info into Maven build info for build ${buildInfoConfig.buildName}:${buildInfoConfig.buildNumber}")
 
@@ -65,7 +69,7 @@ class NpmBuildInfoIntegrationServiceImpl(
         } else {
             // TODO: Implement proper check for Xray scan status/availability before uploading merged build info to avoid race conditions
             logger.warn(
-                "Waiting for $XRAY_INDEXING_WAIT_MINUTES minute(s) before uploading merged build info to prevent Xray indexing race condition"
+                "Waiting for $XRAY_INDEXING_WAIT_MINUTES minute(s) before uploading merged build info to prevent Xray indexing race condition",
             )
             Thread.sleep(TimeUnit.MINUTES.toMillis(XRAY_INDEXING_WAIT_MINUTES))
         }
@@ -82,5 +86,4 @@ class NpmBuildInfoIntegrationServiceImpl(
     companion object {
         private const val XRAY_INDEXING_WAIT_MINUTES = 2L
     }
-
 }

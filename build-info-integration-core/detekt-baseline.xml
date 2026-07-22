@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>ClassOrdering:CommandExecutorServiceImpl.kt$CommandExecutorServiceImpl$override fun executeCommand( command: List&lt;String&gt;, workingDirectory: String?, environmentVariables: Map&lt;String, String&gt;, ): CommandResult</ID>
+    <ID>ClassOrdering:DependenciesBuildInfoResolverImpl.kt$DependenciesBuildInfoResolverImpl$private val buildNameCache = mutableMapOf&lt;String, String&gt;()</ID>
+    <ID>ClassOrdering:JFrogNpmCliServiceImpl.kt$JFrogNpmCliServiceImpl$Companion</ID>
+    <ID>ForbiddenComment:NpmBuildInfoIntegrationServiceImpl.kt$NpmBuildInfoIntegrationServiceImpl$// TODO: Implement proper check for Xray scan status/availability before uploading merged build info to avoid race conditions</ID>
+    <ID>MaxLineLength:ArtifactoryBuildInfoServiceImpl.kt$ArtifactoryBuildInfoServiceImpl$"Build info for dependency build ${dependency.buildName}:${dependency.buildNumber} not found. Skipping: ${e.message}"</ID>
+    <ID>MaxLineLength:ArtifactoryBuildInfoServiceImpl.kt$ArtifactoryBuildInfoServiceImpl$"Error retrieving build info for dependency build ${dependency.buildName}:${dependency.buildNumber}. Skipping: ${e.message}"</ID>
+    <ID>MaxLineLength:ArtifactoryBuildInfoServiceImpl.kt$ArtifactoryBuildInfoServiceImpl$"Merging ${npmDependenciesModules.size} NPM dependency modules into Maven build info (${mavenBuildInfo.name}:${mavenBuildInfo.number})"</ID>
+    <ID>MaxLineLength:ArtifactoryBuildInfoServiceImpl.kt$ArtifactoryBuildInfoServiceImpl$"Merging NPM build info (${npmBuildInfo.name}:${npmBuildInfo.number}) into Maven build info (${mavenBuildInfo.name}:${mavenBuildInfo.number})"</ID>
+    <ID>MaxLineLength:NpmBuildInfoIntegrationServiceImpl.kt$NpmBuildInfoIntegrationServiceImpl$"Waiting for $XRAY_INDEXING_WAIT_MINUTES minute(s) before uploading merged build info to prevent Xray indexing race condition"</ID>
+    <ID>TooGenericExceptionCaught:CommandExecutorServiceImpl.kt$CommandExecutorServiceImpl$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:CommandExecutorServiceImpl.kt$CommandExecutorServiceImpl$e: RuntimeException</ID>
+    <ID>TooGenericExceptionCaught:DependenciesBuildInfoResolverImpl.kt$DependenciesBuildInfoResolverImpl$e: Exception</ID>
+  </CurrentIssues>
+</SmellBaseline>
