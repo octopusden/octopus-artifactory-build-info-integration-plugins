@@ -18,6 +18,27 @@ plugins {
 }
 
 octopusQuality {
+    // Regression guard on what this repository publishes to Maven Central, from octopus-base
+    // v2.7.0. No hand-rolled guard existed here before this change — nothing is being deleted,
+    // this is a straight addition.
+    publication {
+        enforceCentralPublications.set(true)
+        centralPublications.set(
+            setOf(
+                ":build-info-integration-core|maven|org.octopusden.octopus:build-info-integration-core|" +
+                    "[jar, jar:javadoc, jar:sources]",
+                ":octopus-artifactory-npm-gradle-plugin|pluginMaven|" +
+                    "org.octopusden.octopus:octopus-artifactory-npm-gradle-plugin|" +
+                    "[jar, jar:javadoc, jar:sources]",
+                ":octopus-artifactory-npm-gradle-plugin|artifactoryNpmPluginPluginMarkerMaven|" +
+                    "org.octopusden.octopus.artifactory-npm-gradle-plugin:" +
+                    "org.octopusden.octopus.artifactory-npm-gradle-plugin.gradle.plugin|[]",
+                ":octopus-artifactory-npm-maven-plugin|maven|" +
+                    "org.octopusden.octopus:octopus-artifactory-npm-maven-plugin|" +
+                    "[jar, jar:javadoc, jar:sources]",
+            ),
+        )
+    }
     // No JaCoCo/Kover in this repo — keep coverage verification disabled; the static gate
     // (detekt + ktlint) is what qualityStatic enforces.
     coverage {
