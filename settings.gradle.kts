@@ -7,6 +7,7 @@ pluginManagement {
         val octopusQuality = providers.gradleProperty("octopus-quality.version")
         val detekt = providers.gradleProperty("detekt.version")
         val ktlint = providers.gradleProperty("ktlint-gradle.version")
+        val sonarqube = providers.gradleProperty("sonarqube.version")
     }
     plugins {
         kotlin("jvm") version pluginVersion.kotlin.get()
@@ -15,6 +16,7 @@ pluginManagement {
         id("org.octopusden.octopus.oc-template") version pluginVersion.ocTemplate.get()
         // Octopus quality-gates convention plugin + Kotlin linters (see build.gradle.kts).
         id("org.octopusden.octopus-quality") version pluginVersion.octopusQuality.get()
+        id("org.sonarqube") version pluginVersion.sonarqube.get()
         id("io.gitlab.arturbosch.detekt") version pluginVersion.detekt.get()
         id("org.jlleitschuh.gradle.ktlint") version pluginVersion.ktlint.get()
     }
