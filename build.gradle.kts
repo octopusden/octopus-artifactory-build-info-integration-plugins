@@ -10,6 +10,7 @@ plugins {
     id("com.jfrog.artifactory")
     // Octopus quality-gates convention plugin (registers qualityStatic/qualityCoverage/qualityCheck).
     id("org.octopusden.octopus-quality")
+    id("org.sonarqube")
     // Kotlin linters declared here (apply false) so they are on the classpath; applied per
     // Kotlin subproject below. The convention plugin only *configures* detekt/ktlint — the
     // consumer must apply them per Kotlin module (otherwise the static gate is hollow).
