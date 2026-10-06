@@ -20,9 +20,9 @@ tasks.test {
     useJUnitPlatform()
 }
 
-// Gradle 9 turns stricter validation on by default, which also requires every task type to declare
-// why it is not cacheable. Keep the validation that Gradle 8 ran, so the published plugin classes stay
-// as they are.
+// On Gradle 9, java-gradle-plugin turns stricter validation on for a plugin project that applies a
+// publishing plugin (maven-publish here), which also requires every task type to declare why it is not
+// cacheable. Keep the validation that Gradle 8 ran, so the published plugin classes stay as they are.
 tasks.validatePlugins {
     enableStricterValidation.set(false)
 }
