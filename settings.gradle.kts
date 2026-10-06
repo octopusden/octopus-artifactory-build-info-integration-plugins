@@ -1,6 +1,6 @@
 pluginManagement {
     val pluginVersion = object {
-        val kotlin = providers.gradleProperty("kotlin.version")
+        val kotlin = providers.gradleProperty("kotlin-plugin.version")
         val nexusPublish = providers.gradleProperty("nexus-publish.version")
         val jfrogArtifactory = providers.gradleProperty("jfrog-artifactory.version")
         val ocTemplate = providers.gradleProperty("octopus-oc-template.version")
@@ -23,7 +23,7 @@ pluginManagement {
 }
 
 plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
 rootProject.name = "octopus-artifactory-integration"

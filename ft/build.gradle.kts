@@ -141,6 +141,8 @@ dependencies {
         "org.octopusden.octopus.octopus-external-systems-clients:artifactory-client:${property("octopus-artifactory-client.version")}",
     )
     testImplementation("org.junit.jupiter:junit-jupiter:${property("junit.version")}")
+    // Gradle no longer puts the JUnit Platform launcher on the test runtime classpath itself.
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testApi("com.platformlib:platformlib-process-local:${property("platformlib.version")}")
 }
 
